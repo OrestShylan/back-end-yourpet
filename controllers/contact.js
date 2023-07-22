@@ -1,15 +1,15 @@
 const { RequestError, ctrlWrapper } = require("../helpers");
 
-const { Contact } = require("../models/pet");
+const { Pet } = require("../models/pet");
 
 const getAll = async (req, res, next) => {
-  const result = await Contact.find();
+  const result = await Pet.find();
   res.json(result);
 };
 
 const getById = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await Contact.findById(contactId);
+  const result = await Pet.findById(contactId);
   if (!result) {
     throw new RequestError(404, "Not found");
   }
@@ -17,13 +17,13 @@ const getById = async (req, res, next) => {
 };
 
 const add = async (req, res, next) => {
-  const result = await Contact.create(req.body);
+  const result = await Pet.create(req.body);
   res.status(201).json(result);
 };
 
 const update = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+  const result = await Pet.findByIdAndUpdate(contactId, req.body, {
     new: true,
   });
   if (!result) {
@@ -33,7 +33,7 @@ const update = async (req, res, next) => {
 };
 const updateFavorite = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+  const result = await Pet.findByIdAndUpdate(contactId, req.body, {
     new: true,
   });
   if (!result) {
@@ -44,7 +44,7 @@ const updateFavorite = async (req, res, next) => {
 
 const deleteById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await Contact.findByIdAndDelete(contactId);
+  const result = await Pet.findByIdAndDelete(contactId);
   if (!result) {
     throw new RequestError(404, "Not found");
   }
