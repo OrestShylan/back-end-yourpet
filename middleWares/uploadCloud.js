@@ -5,6 +5,7 @@
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
+require("dotenv").config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -15,14 +16,11 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
-    // Determine the folder based on file properties or request data
     let folder;
     if (file.fieldname === "avatar") {
       folder = "avatars";
-    } else if (file.fieldname === "pets") {
-      folder = "pets";
-    } else {
-      folder = "misc";
+    } else if (file.fieldname === "pets-photo") {
+      folder = "pets-photo";
     }
     return {
       folder: folder,
