@@ -8,7 +8,7 @@ const {
   validateFavorite,
 } = require("../../middleWares");
 
-const { schemas } = require("../../models/contact");
+const { schemas } = require("../../models/pet");
 
 const router = express.Router();
 
