@@ -1,7 +1,7 @@
 const app = require("./app");
 const mongoose = require("mongoose");
 const DB_HOST =
-  "mongodb+srv://Orest:iXa821IJF5owWMlr@cluster0.dffktss.mongodb.net/your-pet";
+  "mongodb+srv://Orest:iXa821IJF5owWMlr@cluster0.dffktss.mongodb.net/pets";
 
 mongoose.set("strictQuery", true);
 
