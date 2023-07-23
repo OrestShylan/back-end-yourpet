@@ -16,11 +16,11 @@ router.get("/", ctrl.getAll);
 
 router.get("/:contactId", isValidId, ctrl.getById);
 
-router.post("/", ctrl.add);
+router.post("/", ctrl.addPet);
 
-router.post("/", validateBody(schemas.addschema), ctrl.add);
+router.post("/", validateBody(schemas.addschema), ctrl.addPet);
 
-router.delete("/:contactId", isValidId, ctrl.deleteById);
+router.delete("/:id", isValidId, ctrl.deletePet);
 
 router.put(
   "/:contactId",
