@@ -2,17 +2,9 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const RequestError = require("../helpers/RequestError");
 
-// const signToken = (id) =>
-//   jwt.sign({ id }, process.env.JWT_SECRET, {
-//     expiresIn: process.env.JWT_EXPIRES_IN,
-//   });
-
-const JWT_SECRET = "fbldfbndlfkbmdjhfgk";
-const JWT_EXPIRES_IN = "30d";
-
 const signToken = (id) =>
-  jwt.sign({ id }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+  jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
 const register = async (name, email, password) => {
