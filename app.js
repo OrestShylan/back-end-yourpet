@@ -1,10 +1,7 @@
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 
