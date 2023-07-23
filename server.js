@@ -4,6 +4,7 @@ const DB_HOST =
   "mongodb+srv://Orest:iXa821IJF5owWMlr@cluster0.dffktss.mongodb.net/pets?retryWrites=true&w=majority";
 
 mongoose.set("strictQuery", true);
+require("dotenv").config();
 
 mongoose
   .connect(DB_HOST)
