@@ -11,7 +11,7 @@ const validateBody = (schema) => {
     const { error } = schema.validate(req.body);
 
     if (error) {
-      throw new RequestError(400, error.message);
+      throw RequestError(400, error.message);
     }
 
     next();
