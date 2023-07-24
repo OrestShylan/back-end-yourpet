@@ -5,13 +5,15 @@ const ctrl = require("../../controllers/pet");
 const {
   validateBody,
   isValidId,
-  authenticate,
   uploadCloud,
+  authenticate,
 } = require("../../middleWares");
 
 const { addPetJoiSchema } = require("../../models/petsModel");
 
 const router = express.Router();
+
+router.get("/", authenticate, ctrl.getAllPets);
 
 router.post(
   "/",
