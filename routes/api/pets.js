@@ -14,7 +14,7 @@ const router = express.Router();
 
 router.get("/", ctrl.getAll);
 
-router.get("/:contactId", isValidId, ctrl.getById);
+router.get("/:petId", isValidId, ctrl.getById);
 
 router.post("/", ctrl.addPet);
 
@@ -23,14 +23,14 @@ router.post("/", validateBody(schemas.addschema), ctrl.addPet);
 router.delete("/:id", isValidId, ctrl.deletePet);
 
 router.put(
-  "/:contactId",
+  "/:petID",
   isValidId,
   validateFavorite,
   validateBody(schemas.addschema),
   ctrl.update
 );
 router.patch(
-  "/:contactId/favorite",
+  "/:petId/favorite",
   isValidId,
 
   validateBody(schemas.updateFavoriteSchema),
