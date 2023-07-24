@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const RequestError = require("../helpers/RequestError");
+require("dotenv").config();
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
