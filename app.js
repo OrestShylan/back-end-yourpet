@@ -18,7 +18,7 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-app.use("/users", authRoutes);
+app.use("/api/users", authRoutes);
 app.use("/api/pets", contactsRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

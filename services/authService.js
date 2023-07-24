@@ -50,4 +50,20 @@ const logout = async (_id) => {
   return resultLogout;
 };
 
-module.exports = { register, login, logout };
+const updateUserData = async (
+  _id,
+  avatarURL,
+  name,
+  email,
+  birthday,
+  phone,
+  city
+) => {
+  const updatedUser = await User.findByIdAndUpdate(
+    { _id },
+    { avatarURL, name, email, birthday, phone, city }
+  );
+  return updatedUser;
+};
+
+module.exports = { register, login, logout, updateUserData };

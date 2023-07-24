@@ -18,7 +18,23 @@ const userSchema = new Schema(
     },
     token: {
       type: String,
+      default: "",
+    },
+    avatarURL: {
+      type: String,
       default: null,
+    },
+    birthday: {
+      type: Date,
+      default: null,
+    },
+    phone: {
+      type: String,
+      default: "",
+    },
+    city: {
+      type: String,
+      default: "",
     },
   },
   { timestamps: true, versionKey: false }
