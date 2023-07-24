@@ -5,6 +5,7 @@ const {
   register,
   login,
   logout,
+  updateUserData,
 } = require("../services/authService");
 
 const registerCtrl = async (req, res) => {
@@ -41,8 +42,36 @@ const logoutCtrl = async (req, res) => {
   res.status(204).json();
 };
 
+const getCurrentCtrl = async (req, res) => {
+  const { avatarURL, name, email, birthday, phone, city } = req.user;
+  res.json({ avatarURL, name, email, birthday, phone, city });
+};
+
+const updateUserDataCtrl = async (req, res) => {
+  const { _id } = req.user;
+  const { avatarURL, name, email, birthday, phone, city } = req.body;
+
+  const updatedUser = await updateUserData(
+    _id,
+    avatarURL,
+    name,
+    email,
+    birthday,
+    phone,
+    city
+  );
+
+  if (!updatedUser) {
+    throw RequestError(401, "Not authorized");
+  }
+
+  res.json(updatedUser);
+};
+
 module.exports = {
   registerCtrl: ctrlWrapper(registerCtrl),
   loginCtrl: ctrlWrapper(loginCtrl),
   logoutCtrl: ctrlWrapper(logoutCtrl),
+  getCurrentCtrl: ctrlWrapper(getCurrentCtrl),
+  updateUserDataCtrl: ctrlWrapper(updateUserDataCtrl),
 };

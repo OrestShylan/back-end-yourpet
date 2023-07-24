@@ -38,4 +38,25 @@ const loginSchema = Joi.object({
     }),
 });
 
-module.exports = { registerSchema, loginSchema };
+const dataUserSchema = Joi.object({
+  avatarURL: Joi.string()
+    .base64()
+    .max(3 * 1024 * 1024)
+    .required(),
+  name: Joi.string(),
+  email: Joi.string().email().required(),
+  birthday: Joi.string()
+    .pattern(/^\d{4}-\d{2}-\d{2}$/)
+    .message("The date is due to the format DD-MM-YYYY")
+    .required(),
+  phone: Joi.string()
+    .pattern(/^(\+380|0)[0-9]{9}$/)
+    .message("The number must be in the format +380671234567"),
+  city: Joi.string()
+    .pattern(/^[A-Za-z\s.-]+$/)
+    .message(
+      "The city must be in the format City. For example: Brovary, Kyiv, Akhtyrka, Sumy"
+    ),
+});
+
+module.exports = { registerSchema, loginSchema, dataUserSchema };

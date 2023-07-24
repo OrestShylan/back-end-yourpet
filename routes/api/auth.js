@@ -2,7 +2,11 @@ const express = require("express");
 
 const authController = require("../../controllers/authController");
 
-const { registerSchema, loginSchema } = require("../../schemas/userSchema");
+const {
+  registerSchema,
+  loginSchema,
+  dataUserSchema,
+} = require("../../schemas/userSchema");
 const validateBody = require("../../middleWares/validateBody");
 const authenticate = require("../../middleWares/authMiddleware");
 
@@ -21,5 +25,14 @@ router.post(
 );
 
 router.post("/logout", authenticate, authController.logoutCtrl);
+
+router.get("/current", authenticate, authController.getCurrentCtrl);
+
+router.patch(
+  "/",
+  authenticate,
+  validateBody(dataUserSchema),
+  authController.updateUserDataCtrl
+);
 
 module.exports = router;
