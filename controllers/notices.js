@@ -12,6 +12,23 @@ const searchByTitle = async (req, res, next) => {
   res.json(result);
 };
 
+const getNoticesByCategory = async (req, res, next) => {
+  const { categoryName } = req.params;
+
+  const foundNotices = await Notice.find({ category: categoryName });
+
+  if (!foundNotices) {
+    next(RequestError(404));
+  }
+
+  const notices = [...foundNotices].sort(
+    (firstNotice, secondNotice) =>
+      new Date(secondNotice.createdAt) - new Date(firstNotice.createdAt)
+  );
+  res.json(notices);
+};
+
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
+  getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
 };
