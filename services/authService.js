@@ -10,7 +10,7 @@ require("dotenv").config();
 
 const signToken = (id) =>
   jwt.sign({ id }, `${process.env.JWT_SECRET}`, {
-    expiresIn: 86400,
+    expiresIn: "23h",
   });
 
 const register = async (name, email, password) => {
