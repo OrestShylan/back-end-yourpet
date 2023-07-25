@@ -8,7 +8,7 @@ const swaggerDocument = require("./swagger.json");
 require("dotenv").config();
 const RequestError = require("./helpers/RequestError");
 const authRoutes = require("./routes/api/auth");
-const petRouter = require("./routes/api/pets");
+const contactsRouter = require("./routes/api/pets");
 
 const app = express();
 
@@ -18,9 +18,8 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/users", authRoutes);
-app.use("/api/pets", petRouter);
-
+app.use("/users", authRoutes);
+app.use("/api/pets", contactsRouter);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use((req, res) => {

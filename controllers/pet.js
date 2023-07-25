@@ -1,73 +1,50 @@
 const { RequestError, ctrlWrapper } = require("../helpers");
 
-const { Pet } = require("../models/pet");
+const { Pet } = require("../models/petsModel");
 
-const getAll = async (req, res, next) => {
-  const result = await Pet.find();
-  res.json(result);
-};
+const getAllPets = async (req, res, next) => {
+  const { _id: userId } = req;
+  const { page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
 
-const getById = async (req, res, next) => {
-  const { contactId } = req.params;
-  const result = await Pet.findById(contactId);
+  const result = await Pet.find({ owner: userId, favorite: true }, "", {
+    skip,
+    limit,
+    sort: {
+      updateAt: -1,
+    },
+  }).populate("owner");
+
   if (!result) {
-    throw new RequestError(404, "Not found");
+    return res.status(404).json({
+      message: " Sorry, you have no pets.",
+    });
   }
   res.json(result);
 };
-
-// const add = async (req, res, next) => {
-//   const result = await Pet.create(req.body);
-//   res.status(201).json(result);
-// };
 
 const addPet = async (req, res, next) => {
-  const { id: owner } = req.user;
+  const { id: userId } = req;
 
-  const result = await Pet.create({ ...req.body, owner });
-  result.status(201).json({
-    message: "Hooray! Your pet was succesfully created!",
-  });
-};
-
-const update = async (req, res, next) => {
-  const { contactId } = req.params;
-  const result = await Pet.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
-  if (!result) {
-    throw new RequestError(404, "Not found");
-  }
-  res.json(result);
-};
-const updateFavorite = async (req, res, next) => {
-  const { contactId } = req.params;
-  const result = await Pet.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  });
-  if (!result) {
-    throw new RequestError(404, "Not found");
-  }
-  res.json(result);
+  const result = await Pet.create({ ...req.body, owner: userId });
+  res.status(201).json(result);
 };
 
 const deletePet = async (req, res) => {
   const { id } = req.params;
-  const result = await Pet.findByIdAndRemove(id);
-  if (!result) {
-    throw new RequestError(404, "Pet wasn't found");
-  }
 
-  res.json({
+  const result = await Pet.findByIdAndDelete(id);
+
+  if (!result) {
+    throw new RequestError(404, `Pet with id ${id} non found`);
+  }
+  res.status(200).json({
     message: "Your pet was removed from your account",
   });
 };
 
 module.exports = {
-  getAll: ctrlWrapper(getAll),
-  getById: ctrlWrapper(getById),
+  getAllPets: ctrlWrapper(getAllPets),
   addPet: ctrlWrapper(addPet),
-  update: ctrlWrapper(update),
-  updateFavorite: ctrlWrapper(updateFavorite),
   deletePet: ctrlWrapper(deletePet),
 };

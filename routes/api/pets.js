@@ -5,36 +5,24 @@ const ctrl = require("../../controllers/pet");
 const {
   validateBody,
   isValidId,
-  validateFavorite,
+  uploadCloud,
+  authenticate,
 } = require("../../middleWares");
 
-const { schemas } = require("../../models/pet");
+const { addPetJoiSchema } = require("../../models/petsModel");
 
 const router = express.Router();
 
-router.get("/", ctrl.getAll);
+router.get("/", authenticate, ctrl.getAllPets);
 
-router.get("/:petId", isValidId, ctrl.getById);
-
-router.post("/", ctrl.addPet);
-
-router.post("/", validateBody(schemas.addschema), ctrl.addPet);
-
-router.delete("/:id", isValidId, ctrl.deletePet);
-
-router.put(
-  "/:petID",
-  isValidId,
-  validateFavorite,
-  validateBody(schemas.addschema),
-  ctrl.update
+router.post(
+  "/",
+  authenticate,
+  validateBody(addPetJoiSchema),
+  uploadCloud.single("pets-photo"),
+  ctrl.addPet
 );
-router.patch(
-  "/:petId/favorite",
-  isValidId,
 
-  validateBody(schemas.updateFavoriteSchema),
-  ctrl.updateFavorite
-);
+router.delete("/:id", authenticate, isValidId, ctrl.deletePet);
 
 module.exports = router;
