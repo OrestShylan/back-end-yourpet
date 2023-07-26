@@ -3,7 +3,7 @@ const path = require("path");
 const { ctrlWrapper } = require("../helpers");
 
 const ourFriends = async (req, res) => {
-  const friendsPath = path.join("../externalSources.js/ourFriends.json");
+  const friendsPath = path.join("externalSources", "ourFriends.json");
 
   const friends = JSON.parse(await readFile(friendsPath));
 

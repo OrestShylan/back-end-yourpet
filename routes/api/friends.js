@@ -1,7 +1,9 @@
 const express = require("express");
 const friendsRouter = express.Router();
-const { ourFriends } = require("../../controllers/ourFriends");
+const ctrl = require("../../controllers/ourFriends");
+const { validateBody } = require("../../middleWares");
+const { Friends } = require("../../models/friendsModel");
 
-friendsRouter.get("/", ourFriends);
+friendsRouter.get("/", validateBody(Friends), ctrl.ourFriends);
 
 module.exports = friendsRouter;
