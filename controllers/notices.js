@@ -1,5 +1,5 @@
 const { RequestError, ctrlWrapper } = require("../helpers");
-const Notice = require("../models/noticesModel");
+const {Notice} = require("../models/noticesModel");
 
 const getAll = async (req, res, next) => {
   const { page = 1, limit = 20 } = req.query;

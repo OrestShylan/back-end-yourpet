@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/api/users", authRoutes);
-app.use("api/notices", noticesRouter);
+app.use("/api/notices", noticesRouter);
 app.use("/api/pets", petsRouter);
 app.use("api/friends", friendsRouter);
 
