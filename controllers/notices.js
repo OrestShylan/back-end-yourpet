@@ -1,6 +1,26 @@
 const { RequestError, ctrlWrapper } = require("../helpers");
 const Notice = require("../models/noticesModel");
 
+const getAll = async (req, res, next) => {
+  const { page = 1, limit = 20 } = req.query;
+  const skip = (page - 1) * limit;
+
+  const result = await Notice.find({
+    skip,
+    limit,
+    sort: {
+    updateAt: -1,
+    },
+  }).populate("owner");
+
+  if (!result) {
+    return res.status(404).json({
+      message: " Sorry, you have no pets.",
+    });
+  }
+  res.json(result);
+};
+
 const searchByTitle = async (req, res, next) => {
   const keyword = req.query.keyword;
   const result = await Notice.find({
@@ -31,4 +51,5 @@ const getNoticesByCategory = async (req, res, next) => {
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
+  getAll: ctrlWrapper(getAll),
 };

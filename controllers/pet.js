@@ -3,6 +3,7 @@ const { RequestError, ctrlWrapper } = require("../helpers");
 const { Pet } = require("../models/petsModel");
 
 const getAllPets = async (req, res, next) => {
+  
   const { _id: userId } = req;
   const { page = 1, limit = 20 } = req.query;
   const skip = (page - 1) * limit;
