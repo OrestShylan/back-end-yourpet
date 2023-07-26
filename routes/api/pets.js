@@ -2,14 +2,9 @@ const express = require("express");
 
 const ctrl = require("../../controllers/pet");
 
-const {
-  validateBody,
-  isValidId,
-  uploadCloud,
-  authenticate,
-} = require("../../middleWares");
+const { isValidId, authenticate, validateBody } = require("../../middleWares");
 
-const { addPetJoiSchema } = require("../../models/petsModel");
+const { schemas } = require("../../models/petsModel");
 
 const router = express.Router();
 
@@ -18,8 +13,8 @@ router.get("/", authenticate, ctrl.getAllPets);
 router.post(
   "/",
   authenticate,
-  validateBody(addPetJoiSchema),
-  uploadCloud.single("pets-photo"),
+  validateBody(schemas.addPetJoiSchema),
+  // uploadCloud(schemas.photoConfig),
   ctrl.addPet
 );
 
