@@ -23,9 +23,9 @@ app.use(express.json());
 app.use(express.static("public"));
 
 app.use("/api/users", authRoutes);
-app.use("api/notices", noticesRouter);
+app.use("/api/notices", noticesRouter);
 app.use("/api/pets", petsRouter);
-app.use("api/friends", friendsRouter);
+app.use("/api/friends", friendsRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
