@@ -21,7 +21,17 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 app.use(express.static("public"));
-
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "                           ");
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "Otigin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "GET, POST, PUT, DELETE, OPTIONS"
+  );
+});
 app.use("/api/users", authRoutes);
 app.use("/api/notices", noticesRouter);
 app.use("/api/pets", petsRouter);
