@@ -3,11 +3,6 @@ const User = require("../models/userModel");
 const RequestError = require("../helpers/RequestError");
 require("dotenv").config();
 
-// const signToken = (id) =>
-//   jwt.sign({ id }, process.env.JWT_SECRET, {
-//     expiresIn: process.env.JWT_EXPIRES_IN,
-//   });
-
 const signToken = (id) =>
   jwt.sign({ id }, `${process.env.JWT_SECRET}`, {
     expiresIn: "23h",
@@ -22,7 +17,21 @@ const register = async (name, email, password) => {
 
   newUser.password = undefined;
 
-  return newUser;
+  //return newUser;
+
+  const { token, user } = await login(email, password);
+
+  // return {
+  //   token,
+  //   user,
+  // };
+  return {
+    token,
+    user: {
+      name: newUser.name,
+      email: newUser.email,
+    },
+  };
 };
 
 const login = async (email, password) => {
@@ -40,7 +49,7 @@ const login = async (email, password) => {
   }
 
   userInBase.password = undefined;
- 
+
   const token = signToken(userInBase.id);
   await User.findByIdAndUpdate(userInBase._id, { token });
 

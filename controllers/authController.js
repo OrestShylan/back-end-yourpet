@@ -16,14 +16,9 @@ const registerCtrl = async (req, res) => {
     throw RequestError(409, "Email in use");
   }
 
-  const newUser = await register(name, email, password);
+  const userData = await register(name, email, password);
 
-  res.status(201).json({
-    user: {
-      name: newUser.name,
-      email: newUser.email,
-    },
-  });
+  res.status(201).json(userData);
 };
 
 const loginCtrl = async (req, res) => {

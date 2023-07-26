@@ -7,8 +7,11 @@ const swaggerDocument = require("./swagger.json");
 
 require("dotenv").config();
 const RequestError = require("./helpers/RequestError");
+
 const authRoutes = require("./routes/api/auth");
-const contactsRouter = require("./routes/api/pets");
+const petsRouter = require("./routes/api/pets");
+const noticesRouter = require("./routes/api/notices");
+const friendsRouter = require("./routes/api/friends");
 
 const app = express();
 
@@ -17,9 +20,13 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 app.use("/api/users", authRoutes);
-app.use("/api/pets", contactsRouter);
+app.use("api/notices", noticesRouter);
+app.use("/api/pets", petsRouter);
+app.use("api/friends", friendsRouter);
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use((req, res) => {
