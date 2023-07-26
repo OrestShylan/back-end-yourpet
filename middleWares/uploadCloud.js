@@ -1,7 +1,3 @@
-// //router
-// router.post("/user", authenticate, upload.single("avatar"), ctrl.addAvatar);
-// router.post("/user", authenticate, upload.single("recipeImg"), ctrl.addAvatar);
-// //upload
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const multer = require("multer");
@@ -24,11 +20,14 @@ const storage = new CloudinaryStorage({
     }
     return {
       folder: folder,
-      allowed_formats: ["jpg", "png"], // Adjust the allowed formats as needed
-      public_id: file.originalname, // Use original filename as the public ID
+      allowed_formats: ["jpg", "png"],
+      public_id: file.originalname,
       transformation: [
-        { width: 350, height: 350 },
-        { width: 700, height: 700 },
+        {
+          width: 350,
+          height: null,
+          scale: "both",
+        },
       ],
     };
   },
