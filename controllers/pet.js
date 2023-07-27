@@ -1,44 +1,60 @@
-const { RequestError, ctrlWrapper } = require("../helpers");
+const { ctrlWrapper } = require("../helpers");
 
 const { Pet } = require("../models/petsModel");
 
 const getAllPets = async (req, res, next) => {
-  
-  const { _id: userId } = req;
-  const { page = 1, limit = 20 } = req.query;
+  const {
+    user: { _id: userId },
+    query,
+  } = req;
+
+  const { page = 1, limit = 20 } = query;
   const skip = (page - 1) * limit;
 
-  const result = await Pet.find({ owner: userId, favorite: true }, "", {
+  const totalResults = await Pet.find({ owner: userId }).count();
+  const pets = await Pet.find({ owner: userId }, null, {
     skip,
     limit,
     sort: {
-      updateAt: -1,
+      updatedAt: -1,
     },
-  }).populate("owner");
+  }).lean();
 
-  if (!result) {
-    return res.status(404).json({
-      message: " Sorry, you have no pets.",
-    });
-  }
-  res.json(result);
+  res.json({
+    totalResults,
+    page,
+    totalPages: Math.ceil(totalResults / limit),
+    results: pets,
+  });
 };
 
 const addPet = async (req, res, next) => {
-  const { id: userId } = req;
-
-  const result = await Pet.create({ ...req.body, owner: userId });
-  res.status(201).json(result);
+  // const {
+  //   user: { _id: userId },
+  //   body,
+  // } = req;
+  // // body.photoUrl = file.path;
+  const pet = await Pet.create({ ...req.body, owner: req.user.id });
+  res.status(201).json(pet);
 };
 
 const deletePet = async (req, res) => {
   const { id } = req.params;
+  const userId = req.user.id;
 
-  const result = await Pet.findByIdAndDelete(id);
+  const pet = await Pet.findOneAndRemove({ _id: id, owner: userId });
 
-  if (!result) {
-    throw new RequestError(404, `Pet with id ${id} non found`);
+  if (!pet) {
+    return res.status(404).json({
+      message: "Pet not found",
+    });
   }
+
+  // const { photoId } = pet;
+
+  // await deleteCloudinary(photoId);
+  // await pet.remove();
+
   res.status(200).json({
     message: "Your pet was removed from your account",
   });

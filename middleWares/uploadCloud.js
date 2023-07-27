@@ -1,43 +1,56 @@
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const multer = require("multer");
-require("dotenv").config();
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_KEY,
   api_secret: process.env.CLOUDINARY_SECRET,
 });
+// const multer = require("multer");
+// const { CloudinaryStorage } = require("multer-storage-cloudinary");
+// const cloudinary = require("cloudinary").v2;
 
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: async (req, file) => {
-    let folder;
-    if (file.fieldname === "avatar") {
-      folder = "avatars";
-    } else if (file.fieldname === "pets-photo") {
-      folder = "pets-photo";
-    }
-    return {
-      folder: folder,
-      allowed_formats: ["jpg", "png"],
-      public_id: file.originalname,
-      transformation: [
-        {
-          width: 350,
-          height: null,
-          scale: "both",
-        },
-      ],
-    };
-  },
-});
+// const { RequestError } = require("../helpers");
 
-const uploadCloud = multer({ storage });
+// const storage = new CloudinaryStorage({
+//   cloudinary: cloudinary,
+//   params: async (req, file) => {
+//     const { fieldname, originalname } = file;
 
-module.exports = uploadCloud;
+//     const userId = req.user._id;
+//     const timestamp = Date.now();
 
-// //controller
-// const someFunc = async (req, res) => {
-//   const avatarURL = req.file.path;
-// };
+//     let folder;
+//     let transformation = [
+//       // { width: 336, crop: "scale" },
+//       { quality: "auto:best" },
+//     ];
+//     let uniqueFileName = `${timestamp}_${originalname}`;
+
+//     if (fieldname === "avatar") {
+//       folder = "avatars";
+//       uniqueFileName = `${userId}_${originalname}`;
+//       transformation = [
+//         { width: 182, height: 182, crop: "thumb" },
+//         { quality: "auto:best" },
+//       ];
+//     } else if (fieldname === "pet") {
+//       folder = "pets";
+//     } else {
+//       folder = "misc";
+//     }
+
+//     return {
+//       folder: folder,
+//       allowed_formats: ["jpg", "jpeg", "png", "bmp"],
+//       public_id: uniqueFileName,
+//       transformation: transformation,
+//     };
+//   },
+// });
+
+// const uploadImage = multer({
+//   storage: storage,
+//   limits: { fileSize: 3 * 1024 * 1024 },
+// });
+
+module.exports = cloudinary;

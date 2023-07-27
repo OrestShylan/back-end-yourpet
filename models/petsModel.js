@@ -20,14 +20,14 @@ const petsSchema = new Schema(
       type: String,
       default: "",
     },
-    photoURL: {
+    avatarURL: {
       type: String,
       required: [true, "Pet photo is required"],
     },
+
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
-      required: [true, "Set owner please"],
     },
   },
   { timestamps: true, versionKey: false }
@@ -42,9 +42,25 @@ const addPetJoiSchema = Joi.object().keys({
   birthday: Joi.string().required(),
   type: Joi.string().min(2).max(16).required(),
   comments: Joi.string().min(0).max(120).required(),
+  avatarURL: Joi.string().required(),
 });
+
+const getParams = Joi.object({
+  page: Joi.number().integer().min(1).empty(""),
+  limit: Joi.number().integer().min(1).max(1).required(),
+});
+
+// const photoConfig = {
+//   field: "photo",
+//   folder: "pets",
+// };
+
+const schemas = {
+  addPetJoiSchema,
+  getParams,
+};
 
 module.exports = {
   Pet,
-  addPetJoiSchema,
+  schemas,
 };
