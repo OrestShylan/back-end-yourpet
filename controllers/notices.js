@@ -41,17 +41,26 @@ const searchByTitle = async (req, res, next) => {
 const getNoticesByCategory = async (req, res, next) => {
   const { categoryName } = req.params;
 
-  const foundNotices = await Notice.find({ category: categoryName });
+  try {
+    const foundNotices = await Notice.find({ category: categoryName });
 
-  if (!foundNotices) {
-    next(RequestError(404));
+    if (foundNotices.length === 0) {
+      return res.status(404).json({
+        message: "Notices for this category not found.",
+      });
+    }
+
+    const totalHits = foundNotices.length;
+    const notices = [...foundNotices].sort(
+      (firstNotice, secondNotice) =>
+        new Date(secondNotice.createdAt) - new Date(firstNotice.createdAt)
+    );
+
+    res.json({ totalHits, notices });
+  } catch (error) {
+    console.error("Error while retrieving notices by category:", error);
+    res.status(500).json({ message: "Server error" });
   }
-
-  const notices = [...foundNotices].sort(
-    (firstNotice, secondNotice) =>
-      new Date(secondNotice.createdAt) - new Date(firstNotice.createdAt)
-  );
-  res.json(notices);
 };
 
 module.exports = {
