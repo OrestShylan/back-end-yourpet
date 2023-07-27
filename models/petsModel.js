@@ -20,13 +20,11 @@ const petsSchema = new Schema(
       type: String,
       default: "",
     },
-    photoURL: {
+    avatarURL: {
       type: String,
       required: [true, "Pet photo is required"],
     },
-    photoId: {
-      type: String,
-    },
+
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -44,7 +42,7 @@ const addPetJoiSchema = Joi.object().keys({
   birthday: Joi.string().required(),
   type: Joi.string().min(2).max(16).required(),
   comments: Joi.string().min(0).max(120).required(),
-  photoURL: Joi.string().uri().required(),
+  avatarURL: Joi.string().required(),
 });
 
 const getParams = Joi.object({
