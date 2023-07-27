@@ -3,7 +3,7 @@ const {Notice} = require("../models/noticesModel");
 
 
 const getAll = async (req, res, next) => {
-  const { page = 1, limit = 20 } = req.query;
+  const { page = 1, limit = 12 } = req.query;
   const skip = (page - 1) * limit;
 
   try {
@@ -38,11 +38,18 @@ const searchByTitle = async (req, res, next) => {
   res.json(result);
 };
 
+
 const getNoticesByCategory = async (req, res, next) => {
   const { categoryName } = req.params;
+  const { page = 1, limit = 12 } = req.query;
+  const skip = (page - 1) * limit;
 
   try {
-    const foundNotices = await Notice.find({ category: categoryName });
+    const totalHits = await Notice.countDocuments({ category: categoryName }); 
+    const foundNotices = await Notice.find({ category: categoryName })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     if (foundNotices.length === 0) {
       return res.status(404).json({
@@ -50,11 +57,7 @@ const getNoticesByCategory = async (req, res, next) => {
       });
     }
 
-    const totalHits = foundNotices.length;
-    const notices = [...foundNotices].sort(
-      (firstNotice, secondNotice) =>
-        new Date(secondNotice.createdAt) - new Date(firstNotice.createdAt)
-    );
+    const notices = foundNotices;
 
     res.json({ totalHits, notices });
   } catch (error) {
@@ -62,6 +65,7 @@ const getNoticesByCategory = async (req, res, next) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
