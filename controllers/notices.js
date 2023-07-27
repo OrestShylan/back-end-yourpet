@@ -1,24 +1,30 @@
 const { RequestError, ctrlWrapper } = require("../helpers");
 const {Notice} = require("../models/noticesModel");
 
+
 const getAll = async (req, res, next) => {
   const { page = 1, limit = 20 } = req.query;
   const skip = (page - 1) * limit;
 
-  const result = await Notice.find({
-    skip,
-    limit,
-    sort: {
-    updateAt: -1,
-    },
-  }).populate("owner");
+  try {
+    const totalHits = await Notice.countDocuments(); 
+    const result = await Notice.find({})
+      .skip(skip)
+      .limit(limit)
+      .sort({ updateAt: -1 })
+      .populate("owner");
 
-  if (!result) {
-    return res.status(404).json({
-      message: " Sorry, you have no pets.",
-    });
+    if (!result || result.length === 0) {
+      return res.status(404).json({
+        message: "Sorry, you have no pets.",
+      });
+    }
+
+    res.json({ totalHits, pets: result }); 
+  } catch (error) {
+    console.error("Error while retrieving notices:", error);
+    res.status(500).json({ message: "Server error" });
   }
-  res.json(result);
 };
 
 const searchByTitle = async (req, res, next) => {
