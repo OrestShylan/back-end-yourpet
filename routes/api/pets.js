@@ -5,6 +5,8 @@ const ctrl = require("../../controllers/pet");
 const { isValidId, authenticate, validateBody } = require("../../middleWares");
 
 const { schemas } = require("../../models/petsModel");
+const { uploadTmp } = require("../../services/uploadTmp");
+const updateImage = require("../../middleWares/updateImage");
 
 const router = express.Router();
 
@@ -13,8 +15,9 @@ router.get("/", authenticate, ctrl.getAllPets);
 router.post(
   "/",
   authenticate,
+  uploadTmp.single("photo"),
+  updateImage,
   validateBody(schemas.addPetJoiSchema),
-  // uploadCloud(schemas.photoConfig),
   ctrl.addPet
 );
 

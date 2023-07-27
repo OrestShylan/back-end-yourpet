@@ -24,6 +24,9 @@ const petsSchema = new Schema(
       type: String,
       required: [true, "Pet photo is required"],
     },
+    photoId: {
+      type: String,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
@@ -49,15 +52,14 @@ const getParams = Joi.object({
   limit: Joi.number().integer().min(1).max(1).required(),
 });
 
-const photoConfig = {
-  field: "photo",
-  folder: "pets",
-};
+// const photoConfig = {
+//   field: "photo",
+//   folder: "pets",
+// };
 
 const schemas = {
   addPetJoiSchema,
   getParams,
-  photoConfig,
 };
 
 module.exports = {

@@ -59,6 +59,9 @@ const noticesSchema = new Schema(
       type: String,
       default: null,
     },
+    photoId: {
+      type: String,
+    },
     favorite: [{ type: Schema.Types.ObjectId, ref: "user" }],
   },
   { timestamps: true, versionKey: false }
