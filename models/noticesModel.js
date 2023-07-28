@@ -55,10 +55,11 @@ const noticesSchema = new Schema(
       ref: "user",
       required: true,
     },
-    photoURL: {
+    avatarURL: {
       type: String,
       default: null,
     },
+
     favorite: [{ type: Schema.Types.ObjectId, ref: "user" }],
   },
   { timestamps: true, versionKey: false }
