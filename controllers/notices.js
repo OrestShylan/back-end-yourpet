@@ -1,6 +1,7 @@
 const { RequestError, ctrlWrapper } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
 
+
 // const addNotice = async (req, res, next) => {
 //   try {
 //     const { _id: owner } = req.user;
@@ -15,8 +16,9 @@ const { Notice } = require("../models/noticesModel");
 //   }
 // };
 
+
 const getAll = async (req, res, next) => {
-  const { page = 1, limit = 20 } = req.query;
+  const { page = 1, limit = 12 } = req.query;
   const skip = (page - 1) * limit;
 
   try {
@@ -40,6 +42,7 @@ const getAll = async (req, res, next) => {
   }
 };
 
+
 const getById = async (req, res, next) => {
   try {
     const { id: noticeId } = req.params;
@@ -59,22 +62,55 @@ const getById = async (req, res, next) => {
   }
 };
 
-const searchByTitle = async (req, res, next) => {
-  const keyword = req.query.keyword;
-  const result = await Notice.find({
-    title: { $regex: keyword.toLowerCase(), $options: "i" },
+
+
+const searchByTitle = async (req, res) => {
+  const { page = 1, limit = 12, query = "" } = req.query;
+  const skip = (page - 1) * limit;
+  const { category = "sell" } = req.params;
+
+  const searchWords = query.trim().split(" ");
+
+  const regexExpressions = searchWords.map((word) => ({
+    title: { $regex: new RegExp(word, "i") },
+  }));
+  const searchQuery = {
+    $and: [
+      { category },
+      {
+        $or: regexExpressions,
+      },
+    ],
+    ...req.searchQuery,
+  };
+
+  const notices = await Notice.find(searchQuery, "-createdAt -updatedAt", {
+    skip,
+    limit: Number(limit),
+  }).sort({ createdAt: -1 });
+
+  const totalHits = await Notice.countDocuments(searchQuery);
+
+  res.status(200).json({
+    result: notices,
+    hits: notices.length,
+    totalHits: totalHits,
+
   });
-  if (!result) {
-    next(RequestError(404));
-  }
-  res.json(result);
 };
+
 
 const getNoticesByCategory = async (req, res, next) => {
   const { categoryName } = req.params;
+  const { page = 1, limit = 12 } = req.query;
+  const skip = (page - 1) * limit;
 
   try {
-    const foundNotices = await Notice.find({ category: categoryName });
+    const totalHits = await Notice.countDocuments({ category: categoryName }); 
+    const foundNotices = await Notice.find({ category: categoryName })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     if (foundNotices.length === 0) {
       return res.status(404).json({
@@ -82,11 +118,7 @@ const getNoticesByCategory = async (req, res, next) => {
       });
     }
 
-    const totalHits = foundNotices.length;
-    const notices = [...foundNotices].sort(
-      (firstNotice, secondNotice) =>
-        new Date(secondNotice.createdAt) - new Date(firstNotice.createdAt)
-    );
+    const notices = foundNotices;
 
     res.json({ totalHits, notices });
   } catch (error) {
@@ -94,6 +126,7 @@ const getNoticesByCategory = async (req, res, next) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
