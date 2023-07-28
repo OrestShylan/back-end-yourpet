@@ -16,15 +16,9 @@ const register = async (name, email, password) => {
   });
 
   newUser.password = undefined;
+  
+  const { token } = await login(email, password);
 
-  // return newUser;
-
-  const { token, user } = await login(email, password);
-
-  // return {
-  //   token,
-  //   user,
-  // };
   return {
     token,
     user: {
