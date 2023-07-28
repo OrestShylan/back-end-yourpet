@@ -1,6 +1,22 @@
 const { RequestError, ctrlWrapper } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
 
+
+// const addNotice = async (req, res, next) => {
+//   try {
+//     const { _id: owner } = req.user;
+//     const file = req.file.path;
+//     const { title, content } = req.body;
+//     const noticeData = { title, content, file, owner };
+//     const result = await Notice.create(noticeData);
+
+//     res.status(201).json(result.toObject());
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
 const getAll = async (req, res, next) => {
   const { page = 1, limit = 12 } = req.query;
   const skip = (page - 1) * limit;
@@ -26,16 +42,27 @@ const getAll = async (req, res, next) => {
   }
 };
 
-// const searchByTitle = async (req, res, next) => {
-//   const keyword = req.query.keyword;
-//   const result = await Notice.find({
-//     title: { $regex: keyword.toLowerCase(), $options: "i" },
-//   });
-//   if (!result) {
-//     next(RequestError(404));
-//   }
-//   res.json(result);
-// };
+
+const getById = async (req, res, next) => {
+  try {
+    const { id: noticeId } = req.params;
+
+    const result = await Notice.findById(noticeId, "-updatedAt").populate(
+      "owner",
+      "name email phone"
+    );
+
+    if (!result) {
+      throw new RequestError(404, "Not found");
+    }
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 
 const searchByTitle = async (req, res) => {
   const { page = 1, limit = 12, query = "" } = req.query;
@@ -68,6 +95,7 @@ const searchByTitle = async (req, res) => {
     result: notices,
     hits: notices.length,
     totalHits: totalHits,
+
   });
 };
 
@@ -104,4 +132,5 @@ module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
+  getById: ctrlWrapper(getById),
 };
