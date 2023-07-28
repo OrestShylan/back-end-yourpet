@@ -3,6 +3,7 @@ const { Notice } = require("../models/noticesModel");
 
 
 // const addNotice = async (req, res, next) => {
+  // console.log('hi');
 //   try {
 //     const { _id: owner } = req.user;
 //     const file = req.file.path;
