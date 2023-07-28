@@ -1,4 +1,4 @@
-const { RequestError, ctrlWrapper } = require("../helpers");
+const { ctrlWrapper } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
 
 
@@ -100,14 +100,13 @@ const searchByTitle = async (req, res) => {
   });
 };
 
-
 const getNoticesByCategory = async (req, res, next) => {
   const { categoryName } = req.params;
   const { page = 1, limit = 12 } = req.query;
   const skip = (page - 1) * limit;
 
   try {
-    const totalHits = await Notice.countDocuments({ category: categoryName }); 
+    const totalHits = await Notice.countDocuments({ category: categoryName });
     const foundNotices = await Notice.find({ category: categoryName })
       .skip(skip)
       .limit(limit)
@@ -127,7 +126,6 @@ const getNoticesByCategory = async (req, res, next) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
