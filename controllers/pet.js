@@ -1,4 +1,4 @@
-const { ctrlWrapper } = require("../helpers");
+const { ctrlWrapper, RequestError } = require("../helpers");
 
 const { Pet } = require("../models/petsModel");
 
@@ -29,34 +29,42 @@ const getAllPets = async (req, res, next) => {
 };
 
 const addPet = async (req, res, next) => {
-  // const {
-  //   user: { _id: userId },
-  //   body,
-  // } = req;
-  // // body.photoUrl = file.path;
-  const pet = await Pet.create({ ...req.body, owner: req.user.id });
-  res.status(201).json(pet);
+  const { _id: owner } = req.user;
+
+  if (!req.body) {
+    throw new RequestError(400, "Please fill in your text fields");
+  }
+
+  let avatarURL = null;
+
+  if (req.file) {
+    avatarURL = req.file.path;
+  }
+
+  const result = await Pet.create({
+    ...req.body,
+    avatarURL,
+    owner,
+  });
+  res.status(201).json({
+    message: "Your pet was succesfully added",
+    result,
+  });
 };
 
 const deletePet = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
 
-  const pet = await Pet.findOneAndRemove({ _id: id, owner: userId });
+  const pet = await Pet.findByIdAndDelete({ _id: id, owner: userId });
 
   if (!pet) {
-    return res.status(404).json({
-      message: "Pet not found",
-    });
+    throw new RequestError(404, "Pet wasn't found");
   }
-
-  // const { photoId } = pet;
-
-  // await deleteCloudinary(photoId);
-  // await pet.remove();
 
   res.status(200).json({
     message: "Your pet was removed from your account",
+    pet,
   });
 };
 

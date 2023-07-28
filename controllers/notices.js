@@ -1,9 +1,8 @@
-const { ctrlWrapper } = require("../helpers");
+const { ctrlWrapper, RequestError } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
 
-
 // const addNotice = async (req, res, next) => {
-  // console.log('hi');
+// console.log('hi');
 //   try {
 //     const { _id: owner } = req.user;
 //     const file = req.file.path;
@@ -16,7 +15,6 @@ const { Notice } = require("../models/noticesModel");
 //     next(error);
 //   }
 // };
-
 
 const getAll = async (req, res, next) => {
   const { page = 1, limit = 12 } = req.query;
@@ -43,7 +41,6 @@ const getAll = async (req, res, next) => {
   }
 };
 
-
 const getById = async (req, res, next) => {
   try {
     const { id: noticeId } = req.params;
@@ -62,8 +59,6 @@ const getById = async (req, res, next) => {
     next(error);
   }
 };
-
-
 
 const searchByTitle = async (req, res) => {
   const { page = 1, limit = 12, query = "" } = req.query;
@@ -96,7 +91,6 @@ const searchByTitle = async (req, res) => {
     result: notices,
     hits: notices.length,
     totalHits: totalHits,
-
   });
 };
 
@@ -127,9 +121,52 @@ const getNoticesByCategory = async (req, res, next) => {
   }
 };
 
+const getUsersNotices = async (req, res) => {
+  const { _id: owner } = req.user;
+
+  const { page = 1, limit = 12, query = "" } = req.query;
+  const skip = (page - 1) * limit;
+
+  const searchWords = query.trim().split(" ");
+
+  const regexExpressions = searchWords.map((word) => ({
+    titleOfAdd: { $regex: new RegExp(word, "i") },
+  }));
+
+  const searchQuery = {
+    $and: [
+      { owner },
+      {
+        $or: regexExpressions,
+      },
+    ],
+    ...req.searchQuery,
+  };
+
+  const notices = await Notice.find(searchQuery, "-createdAt -updateAt", {
+    skip,
+    limit: Number(limit),
+  })
+    .sort({ createdAt: -1 })
+    .populate("owner", "username email phone");
+
+  if (!notices) {
+    throw new RequestError(404, "Nothing find for your request");
+  }
+
+  const totalCount = await Notice.countDocuments(searchQuery);
+
+  res.status(200).json({
+    result: notices,
+    hits: notices.length,
+    totalHits: totalCount,
+  });
+};
+
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
   getById: ctrlWrapper(getById),
+  getUsersNotices: ctrlWrapper(getUsersNotices),
 };
