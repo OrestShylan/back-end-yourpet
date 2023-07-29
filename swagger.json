@@ -2,20 +2,20 @@
   "openapi": "3.0.1",
   "info": {
     "version": "2.0.2",
-    "title": "GoIT Final team project",
+    "title": "GoIT Final project",
     "description": "GoIT Final team project",
     "license": {
       "name": "MIT",
       "url": "https://opensource.org/licenses/MIT"
     }
   },
-  "consumes": ["application/json"],
+  "consumes": ["application/json", "multipart/form-data"],
   "produces": ["application/json"],
   "servers": [{ "url": "http://localhost:3000" }],
   "tags": [
     {
-      "name": "Auth",
-      "description": "Authorization endpoints"
+      "name": "Users",
+      "description": "Users endpoints"
     },
     {
       "name": "Notices",
@@ -24,12 +24,16 @@
     {
       "name": "Pets",
       "description": "Endpoints for user's pets"
+    },
+    {
+      "name": "Friends",
+      "description": "Friends endpoints"
     }
   ],
   "paths": {
-    "/auth/register": {
+    "/users/register": {
       "post": {
-        "tags": ["Auth"],
+        "tags": ["Users"],
         "summary": " New user registration",
         "parameters": [],
         "security": [{ "Bearer": [] }],
@@ -63,6 +67,85 @@
             "description": "Provided email already exists",
             "content": {}
           }
+        }
+      }
+    }
+  },
+
+  "/pets": {
+    "patch": {
+      "tags": ["Pets"],
+      "summary": "Add new pet",
+      "security": [{ "Bearer": [] }],
+      "produces": ["application/json"],
+      "requestBody": {
+        "description": "Pet data",
+        "required": true,
+        "content": {
+          "multipart/form-data": {
+            "schema": {
+              "$ref": "#/components/schemas/PetRequest"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Your pet was succesfully added",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PetResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Not authorized",
+          "content": {
+            "application/json": {
+              "examaple": {
+                "message": "Invalid token"
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/pets/delete/{id}": {
+    "patch": {
+      "tags": ["Pets"],
+      "summary": "Delete pet by id",
+      "security": [{ "Bearer": [] }],
+      "parameters": [
+        {
+          "in": "path",
+          "name": "id",
+          "description": "Pet was removed from your account",
+          "required": true,
+          "type": "string"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Your pet was removed from your account",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteResponse"
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Not authorized"
+        },
+        "404": {
+          "description": "pet wasn't found"
         }
       }
     }
