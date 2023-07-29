@@ -24,7 +24,7 @@ const noticesSchema = new Schema(
       minLength: 2,
       maxLength: 16,
     },
-    birthday: {
+    date: {
       type: Date,
       get: (v) => moment(v).format("DD.MM.YYYY"),
       set: (v) => moment(v, "DD.MM.YYYY").toDate(),
@@ -80,7 +80,7 @@ const addSchema = Joi.object({
   category: Joi.string().allow("lost-found", "for-free", "sell").required(),
   title: Joi.string().required(),
   name: Joi.string(),
-  birthday: Joi.string(),
+  date: Joi.date(),
   type: Joi.string(),
   sex: Joi.string().allow("male", "female").required(),
   location: Joi.string(),
