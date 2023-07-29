@@ -14,7 +14,7 @@ const noticesFilter = async (req, res, next) => {
     const today = new Date();
     switch (age) {
       case "3m-12m":
-        query.birthday = {
+        query.date = {
           $gte: new Date(
             today.getFullYear() - 1,
             today.getMonth(),
@@ -25,7 +25,7 @@ const noticesFilter = async (req, res, next) => {
         break;
 
       case "1y":
-        query.birthday = {
+        query.date = {
           $gte: new Date(
             today.getFullYear() - 2,
             today.getMonth(),
@@ -40,7 +40,7 @@ const noticesFilter = async (req, res, next) => {
         break;
 
       case "2y":
-        query.birthday = {
+        query.date = {
           $lt: new Date(
             today.getFullYear() - 2,
             today.getMonth(),

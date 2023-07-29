@@ -37,6 +37,7 @@ const searchByTitle = async (req, res) => {
   const regexExpressions = searchWords.map((word) => ({
     title: { $regex: new RegExp(word, "i") },
   }));
+
   const searchQuery = {
     $and: [
       { category },
@@ -114,7 +115,7 @@ const addToFavorite = async (req, res) => {
     { new: true }
   ).populate(
     "favorite",
-    "title avatarURL category name birthday location price sex comments"
+    "title avatarURL category name location price sex comments"
   );
 
   updatedUser.password = undefined;
