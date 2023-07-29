@@ -1,4 +1,4 @@
-const { ctrlWrapper } = require("../helpers");
+const { ctrlWrapper, RequestError } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
 
 
