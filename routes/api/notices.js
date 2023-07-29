@@ -12,6 +12,6 @@ router.get("/search", ctrl.searchByTitle);
 router.get("/search/:category", noticesFilter, ctrl.searchByTitle);
 
 router.get("/:categoryName", ctrl.getNoticesByCategory);
-router.get("/my-pets", authenticate, noticesFilter, ctrl.getUsersNotices);
+router.get("/", authenticate, noticesFilter, ctrl.getUsersNotices);
 
 module.exports = router;

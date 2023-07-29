@@ -162,7 +162,6 @@ const getUsersNotices = async (req, res) => {
     totalHits: totalCount,
   });
 };
-
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
