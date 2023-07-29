@@ -2,19 +2,19 @@ const { RequestError, ctrlWrapper } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
 
 
-// const addNotice = async (req, res, next) => {
-//   try {
-//     const { _id: owner } = req.user;
-//     const file = req.file.path;
-//     const { title, content } = req.body;
-//     const noticeData = { title, content, file, owner };
-//     const result = await Notice.create(noticeData);
+const addNotice = async (req, res, next) => {
+  try {
+    const { _id: owner } = req.user;
+    const file = req.file.path;
+    const { title, content } = req.body;
+    const noticeData = { title, content, file, owner };
+    const result = await Notice.create(noticeData);
 
-//     res.status(201).json(result.toObject());
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    res.status(201).json(result.toObject());
+  } catch (error) {
+    next(error);
+  }
+};
 
 
 const getAll = async (req, res, next) => {
@@ -157,5 +157,6 @@ module.exports = {
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
   getById: ctrlWrapper(getById),
-  deleteById: ctrlWrapper(deleteById)
+  deleteById: ctrlWrapper(deleteById),
+  addNotice: ctrlWrapper(addNotice)
 };
