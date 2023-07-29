@@ -62,6 +62,30 @@ const getById = async (req, res, next) => {
   }
 };
 
+const deleteById = async (req, res, next) => {
+  try {
+    const { id: noticeId } = req.params;
+    const { _id: owner } = req.user;
+
+
+    const deletedNotice = await Notice.findByIdAndDelete(noticeId, {
+      owner: owner,
+    });
+
+    if (!deletedNotice) {
+      throw new RequestError(404, "Notice not found");
+    }
+
+    
+    res.json({
+      message: "Delete is success",
+      deletedNoticeId: noticeId,
+    });
+  } catch (error) {
+   
+    next(error);
+  }
+};
 
 
 const searchByTitle = async (req, res) => {
@@ -133,4 +157,5 @@ module.exports = {
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
   getById: ctrlWrapper(getById),
+  deleteById: ctrlWrapper(deleteById)
 };
