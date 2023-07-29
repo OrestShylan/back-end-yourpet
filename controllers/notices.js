@@ -122,24 +122,20 @@ const getNoticesByCategory = async (req, res, next) => {
 };
 
 const getUsersNotices = async (req, res) => {
-  const { _id: owner } = req.user;
+  const owner = req.user._id;
 
   const { page = 1, limit = 12, query = "" } = req.query;
   const skip = (page - 1) * limit;
 
   const searchWords = query.trim().split(" ");
 
-  const regexExpressions = searchWords.map((word) => ({
-    titleOfAdd: { $regex: new RegExp(word, "i") },
-  }));
+  // const regexExpressions = searchWords.map((word) => ({
+  //   titleOfAdd: { $regex: new RegExp(word, "i") },
+  // }));
 
   const searchQuery = {
-    $and: [
-      { owner },
-      {
-        $or: regexExpressions,
-      },
-    ],
+    owner,
+    titleOfAdd: { $in: searchWords },
     ...req.searchQuery,
   };
 
@@ -150,7 +146,7 @@ const getUsersNotices = async (req, res) => {
     .sort({ createdAt: -1 })
     .populate("owner", "username email phone");
 
-  if (!notices) {
+  if (!notices || notices.length === 0) {
     throw new RequestError(404, "Nothing find for your request");
   }
 
