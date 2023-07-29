@@ -23,7 +23,12 @@ router.post("/owner", authenticate, validateBody, ctrl.addNotice);
 router.get("/search", ctrl.searchByTitle);
 
 router.get("/:categoryName", ctrl.getNoticesByCategory);
-router.get("/", authenticate, noticesFilter, ctrl.getUsersNotices);
+router.get(
+  "/getUsersNotices",
+  authenticate,
+  noticesFilter,
+  ctrl.getUsersNotices
+);
 
 router.post("/favorite/:id", authenticate, ctrl.addToFavorite);
 

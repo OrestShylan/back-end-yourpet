@@ -166,13 +166,11 @@ const getUsersNotices = async (req, res) => {
 
   const searchWords = query.trim().split(" ");
 
-  // const regexExpressions = searchWords.map((word) => ({
-  //   titleOfAdd: { $regex: new RegExp(word, "i") },
-  // }));
-
   const searchQuery = {
     owner,
-    titleOfAdd: { $in: searchWords },
+    $or: searchWords.map((word) => ({
+      titleOfAdd: { $regex: new RegExp(word, "i") },
+    })),
     ...req.searchQuery,
   };
 
@@ -195,6 +193,7 @@ const getUsersNotices = async (req, res) => {
     totalHits: totalCount,
   });
 };
+
 const addToFavorite = async (req, res) => {
   const { _id: userId } = req.user;
   const { id: noticeId } = req.params;
