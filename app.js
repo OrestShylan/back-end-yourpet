@@ -13,6 +13,7 @@ const petsRouter = require("./routes/api/pets");
 const noticesRouter = require("./routes/api/notices");
 const friendsRouter = require("./routes/api/friends");
 
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -33,6 +34,7 @@ app.use("/api/users", authRoutes);
 app.use("/api/notices", noticesRouter);
 app.use("/api/pets", petsRouter);
 app.use("/api/friends", friendsRouter);
+
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
