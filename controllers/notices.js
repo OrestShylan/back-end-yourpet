@@ -1,5 +1,6 @@
 const { RequestError, ctrlWrapper } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
+const { User } = require("../models/userModel");
 
 const getAll = async (req, res, next) => {
   const { page = 1, limit = 12 } = req.query;
@@ -25,17 +26,6 @@ const getAll = async (req, res, next) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-// const searchByTitle = async (req, res, next) => {
-//   const keyword = req.query.keyword;
-//   const result = await Notice.find({
-//     title: { $regex: keyword.toLowerCase(), $options: "i" },
-//   });
-//   if (!result) {
-//     next(RequestError(404));
-//   }
-//   res.json(result);
-// };
 
 const searchByTitle = async (req, res) => {
   const { page = 1, limit = 12, query = "" } = req.query;
@@ -65,12 +55,10 @@ const searchByTitle = async (req, res) => {
   const totalHits = await Notice.countDocuments(searchQuery);
 
   res.status(200).json({
-    result: notices,
-    hits: notices.length,
+    notices,
     totalHits: totalHits,
   });
 };
-
 
 const getNoticesByCategory = async (req, res, next) => {
   const { categoryName } = req.params;
@@ -78,7 +66,7 @@ const getNoticesByCategory = async (req, res, next) => {
   const skip = (page - 1) * limit;
 
   try {
-    const totalHits = await Notice.countDocuments({ category: categoryName }); 
+    const totalHits = await Notice.countDocuments({ category: categoryName });
     const foundNotices = await Notice.find({ category: categoryName })
       .skip(skip)
       .limit(limit)
@@ -99,9 +87,54 @@ const getNoticesByCategory = async (req, res, next) => {
   }
 };
 
+const addToFavorite = async (req, res) => {
+  const { _id: userId } = req.user;
+  const { id: noticeId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new RequestError(404, `User with id: ${userId} not found`);
+  }
+  const notice = await Notice.findById(noticeId);
+  if (!notice) {
+    throw new RequestError(404, `notice with id: ${noticeId} not found`);
+  }
+
+  const index = notice.favorite.indexOf(userId);
+
+  if (index !== -1) {
+    return res.json({
+      message: `User with id ${userId} already has this notice  in favorite list`,
+    });
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $push: { favorite: noticeId } },
+    { new: true }
+  ).populate(
+    "favorite",
+    "title avatarURL category name birthday location price sex comments"
+  );
+
+  updatedUser.password = undefined;
+
+  const updatedNotice = await Notice.findByIdAndUpdate(
+    noticeId,
+    { $push: { favorite: userId } },
+    { new: true }
+  );
+
+  res.json({
+    result: {
+      updatedNotice,
+    },
+  });
+};
 
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
+  addToFavorite: ctrlWrapper(addToFavorite),
 };

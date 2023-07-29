@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const { handleMongooseError } = require("../helpers");
 const Joi = require("joi");
+const moment = require("moment");
 
 const noticesSchema = new Schema(
   {
@@ -24,8 +25,16 @@ const noticesSchema = new Schema(
       maxLength: 16,
     },
     birthday: {
-      type: String,
-      default: "",
+      type: Date,
+      get: (v) => moment(v).format("DD.MM.YYYY"),
+      set: (v) => moment(v, "DD.MM.YYYY").toDate(),
+      validate: {
+        validator: function (value) {
+          return moment(value, "DD.MM.YYYY", true).isValid();
+        },
+        message: "Invalid birth date format (must be dd.mm.yyyy)",
+      },
+      default: null,
     },
     type: {
       type: String,
