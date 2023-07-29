@@ -7,7 +7,6 @@ const friendsSchema = new Schema(
   {
     title: {
       type: String,
-      required: [true, "Title is required"],
     },
     url: {
       type: String,
@@ -44,10 +43,10 @@ const friendsSchema = new Schema(
 const Friends = model("Friends", friendsSchema);
 
 const friends = Joi.object({
-  title: Joi.string().required(),
+  title: Joi.string(),
   url: Joi.string(),
   addressUrl: Joi.date(),
-  imgUrl: Joi.string().default(""),
+  imageUrl: Joi.string().default(""),
   address: Joi.string(),
   workDays: Joi.array(),
   phone: Joi.string(),
