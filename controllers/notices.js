@@ -10,13 +10,26 @@ const addNotice = async (req, res, next) => {
     const noticeData = { title, content, file, owner };
     const result = await Notice.create(noticeData);
 
+    // const addNotice = async (req, res, next) => {
+    // console.log('hi');
+    //   try {
+    //     const { _id: owner } = req.user;
+    //     const file = req.file.path;
+    //     const { title, content } = req.body;
+    //     const noticeData = { title, content, file, owner };
+    //     const result = await Notice.create(noticeData);
+
+    //     res.status(201).json(result.toObject());
+    //   } catch (error) {
+    //     next(error);
+    //   }
+    // };
 
     res.status(201).json(result.toObject());
   } catch (error) {
     next(error);
   }
 };
-
 
 const getAll = async (req, res, next) => {
   const { page = 1, limit = 12 } = req.query;
@@ -67,7 +80,6 @@ const deleteById = async (req, res, next) => {
     const { id: noticeId } = req.params;
     const { _id: owner } = req.user;
 
-
     const deletedNotice = await Notice.findByIdAndDelete(noticeId, {
       owner: owner,
     });
@@ -76,13 +88,11 @@ const deleteById = async (req, res, next) => {
       throw new RequestError(404, "Notice not found");
     }
 
-    
     res.json({
       message: "Delete is success",
       deletedNoticeId: noticeId,
     });
   } catch (error) {
-   
     next(error);
   }
 };
@@ -118,7 +128,6 @@ const searchByTitle = async (req, res) => {
   res.status(200).json({
     notices,
     totalHits: totalHits,
-
   });
 };
 
@@ -149,6 +158,43 @@ const getNoticesByCategory = async (req, res, next) => {
   }
 };
 
+const getUsersNotices = async (req, res) => {
+  const owner = req.user._id;
+
+  const { page = 1, limit = 12, query = "" } = req.query;
+  const skip = (page - 1) * limit;
+
+  const searchWords = query.trim().split(" ");
+
+  // const regexExpressions = searchWords.map((word) => ({
+  //   titleOfAdd: { $regex: new RegExp(word, "i") },
+  // }));
+
+  const searchQuery = {
+    owner,
+    titleOfAdd: { $in: searchWords },
+    ...req.searchQuery,
+  };
+
+  const notices = await Notice.find(searchQuery, "-createdAt -updateAt", {
+    skip,
+    limit: Number(limit),
+  })
+    .sort({ createdAt: -1 })
+    .populate("owner", "username email phone");
+
+  if (!notices || notices.length === 0) {
+    throw new RequestError(404, "Nothing find for your request");
+  }
+
+  const totalCount = await Notice.countDocuments(searchQuery);
+
+  res.status(200).json({
+    result: notices,
+    hits: notices.length,
+    totalHits: totalCount,
+  });
+};
 const addToFavorite = async (req, res) => {
   const { _id: userId } = req.user;
   const { id: noticeId } = req.params;
@@ -194,13 +240,13 @@ const addToFavorite = async (req, res) => {
   });
 };
 
-
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
   addToFavorite: ctrlWrapper(addToFavorite),
   getById: ctrlWrapper(getById),
+  getUsersNotices: ctrlWrapper(getUsersNotices),
   deleteById: ctrlWrapper(deleteById),
   addNotice: ctrlWrapper(addNotice),
 };

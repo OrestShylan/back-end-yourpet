@@ -9,6 +9,7 @@ const {
 } = require("../../schemas/userSchema");
 const validateBody = require("../../middleWares/validateBody");
 const authenticate = require("../../middleWares/authMiddleware");
+const { uploadCloud } = require("../../middleWares");
 
 const router = express.Router();
 
@@ -18,11 +19,7 @@ router.post(
   authController.registerCtrl
 );
 
-router.post(
-  "/login",
-  validateBody(loginSchema),
-  authController.loginCtrl
-);
+router.post("/login", validateBody(loginSchema), authController.loginCtrl);
 
 router.post("/logout", authenticate, authController.logoutCtrl);
 
@@ -32,6 +29,7 @@ router.patch(
   "/",
   authenticate,
   validateBody(dataUserSchema),
+  uploadCloud.single("avatars"),
   authController.updateUserDataCtrl
 );
 
