@@ -11,7 +11,8 @@
   },
   "consumes": ["application/json", "multipart/form-data"],
   "produces": ["application/json"],
-  "servers": [{ "url": "http://localhost:3000" }],
+  "servers": [{ "url": "http://localhost:3000" }, 
+{"url":" https://back-end-yourpet.onrender.com/api-docs"}],
   "tags": [
     {
       "name": "Users",
