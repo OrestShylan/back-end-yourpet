@@ -86,9 +86,10 @@ const addSchema = Joi.object({
   location: Joi.string(),
   price: Joi.string(),
   comments: Joi.string(),
+  favorite: [{ type: Schema.Types.ObjectId, ref: "user" }],
 });
 
-const Notice = model("Notice", noticesSchema);
+const Notice = model("notice", noticesSchema);
 const schemas = { addSchema };
 
 module.exports = { Notice, schemas };

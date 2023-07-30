@@ -1,6 +1,6 @@
 const { ctrlWrapper, RequestError } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
-const { User } = require("../models/userModel");
+const User = require("../models/userModel");
 
 const addNotice = async (req, res, next) => {
   try {
@@ -200,7 +200,8 @@ const addToFavorite = async (req, res) => {
   const { _id: userId } = req.user;
   const { id: noticeId } = req.params;
 
-  const user = await User.findById(userId);
+  const user = await User.findOne(userId);
+
   if (!user) {
     throw new RequestError(404, `User with id: ${userId} not found`);
   }
@@ -213,7 +214,7 @@ const addToFavorite = async (req, res) => {
 
   if (index !== -1) {
     return res.json({
-      message: `User with id ${userId} already has this notice  in favorite list`,
+      message: `User with id ${userId} already has this notice in favorite list`,
     });
   }
 
@@ -233,6 +234,8 @@ const addToFavorite = async (req, res) => {
     { $push: { favorite: userId } },
     { new: true }
   );
+
+  console.log(updatedNotice);
 
   res.json({
     result: {

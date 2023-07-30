@@ -38,8 +38,18 @@ const logoutCtrl = async (req, res) => {
 };
 
 const getCurrentCtrl = async (req, res) => {
-  const { avatarURL, name, email, birthday, phone, city, favorite } = req.user;
-  res.json({ avatarURL, name, email, birthday, phone, city, favorite });
+  const { _id, avatarURL, name, email, birthday, phone, city, favorite } =
+    req.user;
+  res.json({
+    id: _id,
+    avatarURL,
+    name,
+    email,
+    birthday,
+    phone,
+    city,
+    favorite,
+  });
 };
 
 const updateUserDataCtrl = async (req, res) => {
