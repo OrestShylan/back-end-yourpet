@@ -19,8 +19,10 @@ const getAllPets = async (req, res, next) => {
       updatedAt: -1,
     },
   }).lean();
-
-  res.json({
+  if (!pets) {
+    next(RequestError(404, "No pets for your request"));
+  }
+  res.status(200).json({
     totalResults,
     page,
     totalPages: Math.ceil(totalResults / limit),
@@ -29,27 +31,46 @@ const getAllPets = async (req, res, next) => {
 };
 
 const addPet = async (req, res, next) => {
-  const { _id: owner } = req.user;
-
-  if (!req.body) {
-    throw new RequestError(400, "Please fill in your text fields");
+  if (!req.file) {
+    throw RequestError(400, "Image is required");
   }
 
-  let avatarURL = null;
+  const {
+    user: { _id: userId },
+    body,
+  } = req;
 
-  if (req.file) {
-    avatarURL = req.file.path;
-  }
-
-  const result = await Pet.create({
-    ...req.body,
-    avatarURL,
-    owner,
+  const pet = await Pet.create({
+    ...body,
+    owner: userId,
+    avatarURL: req.file.path,
   });
+
   res.status(201).json({
     message: "Your pet was succesfully added",
-    result,
+    pet,
   });
+  // const { _id: owner } = req.user;
+
+  // if (!req.body) {
+  //   throw new RequestError(400, "Please fill in your text fields");
+  // }
+
+  // let avatarURL = null;
+
+  // if (req.file) {
+  //   avatarURL = req.file.path;
+  // }
+
+  // const result = await Pet.create({
+  //   ...req.body,
+  //   avatarURL,
+  //   owner,
+  // });
+  // res.status(201).json({
+  //   message: "Your pet was succesfully added",
+  //   result,
+  // });
 };
 
 const deletePet = async (req, res) => {

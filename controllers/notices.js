@@ -158,41 +158,35 @@ const getNoticesByCategory = async (req, res, next) => {
   }
 };
 
-const getUsersNotices = async (req, res) => {
-  const owner = req.user._id;
+const getUsersNotices = async (req, res, next) => {
+  const {
+    user: { _id: userId },
+    query,
+  } = req;
 
-  const { page = 1, limit = 12, query = "" } = req.query;
+  const { page = 1, limit = 12 } = query;
   const skip = (page - 1) * limit;
 
-  const searchWords = query.trim().split(" ");
-
-  // const regexExpressions = searchWords.map((word) => ({
-  //   titleOfAdd: { $regex: new RegExp(word, "i") },
-  // }));
-
-  const searchQuery = {
-    owner,
-    titleOfAdd: { $in: searchWords },
-    ...req.searchQuery,
-  };
-
-  const notices = await Notice.find(searchQuery, "-createdAt -updateAt", {
+  const totalResults = await Notice.find({ owner: userId }).countDocuments();
+  const notices = await Notice.find({ owner: userId }, null, {
     skip,
-    limit: Number(limit),
+    limit,
+    sort: {
+      updatedAt: -1,
+    },
   })
-    .sort({ createdAt: -1 })
-    .populate("owner", "username email phone");
+    .populate("owner")
+    .lean();
 
-  if (!notices || notices.length === 0) {
-    throw new RequestError(404, "Nothing find for your request");
+  if (!notices) {
+    next(RequestError(404, "Not found"));
   }
 
-  const totalCount = await Notice.countDocuments(searchQuery);
-
   res.status(200).json({
-    result: notices,
-    hits: notices.length,
-    totalHits: totalCount,
+    totalResults,
+    page,
+    totalPages: Math.ceil(totalResults / limit),
+    results: notices,
   });
 };
 
