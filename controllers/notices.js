@@ -195,6 +195,7 @@ const getUsersNotices = async (req, res) => {
     totalHits: totalCount,
   });
 };
+
 const addToFavorite = async (req, res) => {
   const { _id: userId } = req.user;
   const { id: noticeId } = req.params;
@@ -240,11 +241,42 @@ const addToFavorite = async (req, res) => {
   });
 };
 
+const removeFromFavorite = async (req, res) => {
+  const { _id: userId } = req.user;
+  const { id: noticeId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new RequestError(404, `User with id: ${userId} not found`);
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $pull: { favorite: { $eq: noticeId } } },
+    { new: true }
+  ).populate(
+    "favorite",
+    "title avatarURL category name location price sex comments"
+  );
+
+  updatedUser.password = undefined;
+  const updatedNotice = await Notice.findByIdAndUpdate(
+    noticeId,
+    { $pull: { favorite: { $eq: userId } } },
+    { new: true }
+  );
+
+  res.json({
+    result: { updatedNotice },
+  });
+};
+
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
   addToFavorite: ctrlWrapper(addToFavorite),
+  removeFromFavorite: ctrlWrapper(removeFromFavorite),
   getById: ctrlWrapper(getById),
   getUsersNotices: ctrlWrapper(getUsersNotices),
   deleteById: ctrlWrapper(deleteById),
