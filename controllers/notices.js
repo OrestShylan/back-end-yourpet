@@ -167,14 +167,16 @@ const getUsersNotices = async (req, res, next) => {
   const { page = 1, limit = 12 } = query;
   const skip = (page - 1) * limit;
 
-  const totalResults = await Notice.find({ owner: userId }).count();
+  const totalResults = await Notice.find({ owner: userId }).countDocuments();
   const notices = await Notice.find({ owner: userId }, null, {
     skip,
     limit,
     sort: {
       updatedAt: -1,
     },
-  }).lean();
+  })
+    .populate("owner")
+    .lean();
 
   if (!notices) {
     next(RequestError(404, "Not found"));

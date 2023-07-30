@@ -6,13 +6,10 @@ const {
   isValidId,
   authenticate,
   validateBody,
-  uploadCloud,
+  upload,
 } = require("../../middleWares");
 
 const { schemas } = require("../../models/petsModel");
-// const uploadImage = require("../../middleWares/uploadCloud");
-// const { uploadTmp } = require("../../services/uploadTmp");
-// const updateImage = require("../../middleWares/updateImage");
 
 const router = express.Router();
 
@@ -21,7 +18,7 @@ router.get("/", authenticate, ctrl.getAllPets);
 router.post(
   "/",
   authenticate,
-  uploadCloud(schemas.photoConfig),
+  upload.single("avatarURL"),
   validateBody(schemas.addPetJoiSchema),
   ctrl.addPet
 );

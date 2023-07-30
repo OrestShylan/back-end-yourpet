@@ -42,7 +42,7 @@ const addPetJoiSchema = Joi.object().keys({
   birthday: Joi.string().required(),
   type: Joi.string().min(2).max(16).required(),
   comments: Joi.string().min(0).max(120).required(),
-  avatarURL: Joi.string().uri().required(),
+  avatarURL: Joi.string(),
 });
 
 const getParams = Joi.object({
