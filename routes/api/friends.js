@@ -8,4 +8,4 @@ friendsRouter.get("/", ctrl.ourFriends);
 
 module.exports = friendsRouter;
 
-// validateBody(Friends), 
+// validateBody(Friends),
