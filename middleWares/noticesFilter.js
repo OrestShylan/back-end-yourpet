@@ -1,7 +1,7 @@
 const noticesFilter = async (req, res, next) => {
-  const { gender } = req.query;
+  const { gender, age } = req.query;
   const query = {};
-  if (!gender) {
+  if (!gender && !age) {
     next();
     return;
   }
@@ -10,6 +10,49 @@ const noticesFilter = async (req, res, next) => {
     query.sex = gender.toLowerCase();
   }
 
+  if (age) {
+    const today = new Date();
+    switch (age) {
+      case "3m-12m":
+        query.date = {
+          $gte: new Date(
+            today.getFullYear() - 1,
+            today.getMonth(),
+            today.getDate()
+          ),
+          $lt: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
+        };
+        break;
+
+      case "1y":
+        query.date = {
+          $gte: new Date(
+            today.getFullYear() - 2,
+            today.getMonth(),
+            today.getDate()
+          ),
+          $lt: new Date(
+            today.getFullYear() - 1,
+            today.getMonth(),
+            today.getDate()
+          ),
+        };
+        break;
+
+      case "2y":
+        query.date = {
+          $lt: new Date(
+            today.getFullYear() - 2,
+            today.getMonth(),
+            today.getDate()
+          ),
+        };
+        break;
+
+      default:
+        break;
+    }
+  }
   req.searchQuery = query;
   next();
 };

@@ -9,14 +9,17 @@ const signToken = (id) =>
   });
 
 const register = async (name, email, password) => {
+  const defaultAvatar =
+    "https://res.cloudinary.com/do316uvkf/image/upload/v1680493837/szccttwukvqfijjovgz5.jpg";
   const newUser = await User.create({
     name,
     email,
     password,
+    avatarURL: defaultAvatar,
   });
 
   newUser.password = undefined;
-  
+
   const { token } = await login(email, password);
 
   return {
@@ -24,6 +27,7 @@ const register = async (name, email, password) => {
     user: {
       name: newUser.name,
       email: newUser.email,
+      avatarURL: newUser.avatarURL,
     },
   };
 };

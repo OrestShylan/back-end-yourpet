@@ -1,7 +1,6 @@
 const { ctrlWrapper, RequestError } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
-
-
+const { User } = require("../models/userModel");
 
 const addNotice = async (req, res, next) => {
   try {
@@ -11,13 +10,26 @@ const addNotice = async (req, res, next) => {
     const noticeData = { title, content, file, owner };
     const result = await Notice.create(noticeData);
 
+    // const addNotice = async (req, res, next) => {
+    // console.log('hi');
+    //   try {
+    //     const { _id: owner } = req.user;
+    //     const file = req.file.path;
+    //     const { title, content } = req.body;
+    //     const noticeData = { title, content, file, owner };
+    //     const result = await Notice.create(noticeData);
+
+    //     res.status(201).json(result.toObject());
+    //   } catch (error) {
+    //     next(error);
+    //   }
+    // };
 
     res.status(201).json(result.toObject());
   } catch (error) {
     next(error);
   }
 };
-
 
 const getAll = async (req, res, next) => {
   const { page = 1, limit = 12 } = req.query;
@@ -44,7 +56,6 @@ const getAll = async (req, res, next) => {
   }
 };
 
-
 const getById = async (req, res, next) => {
   try {
     const { id: noticeId } = req.params;
@@ -69,7 +80,6 @@ const deleteById = async (req, res, next) => {
     const { id: noticeId } = req.params;
     const { _id: owner } = req.user;
 
-
     const deletedNotice = await Notice.findByIdAndDelete(noticeId, {
       owner: owner,
     });
@@ -78,17 +88,14 @@ const deleteById = async (req, res, next) => {
       throw new RequestError(404, "Notice not found");
     }
 
-    
     res.json({
       message: "Delete is success",
       deletedNoticeId: noticeId,
     });
   } catch (error) {
-   
     next(error);
   }
 };
-
 
 const searchByTitle = async (req, res) => {
   const { page = 1, limit = 12, query = "" } = req.query;
@@ -100,6 +107,7 @@ const searchByTitle = async (req, res) => {
   const regexExpressions = searchWords.map((word) => ({
     title: { $regex: new RegExp(word, "i") },
   }));
+
   const searchQuery = {
     $and: [
       { category },
@@ -118,10 +126,8 @@ const searchByTitle = async (req, res) => {
   const totalHits = await Notice.countDocuments(searchQuery);
 
   res.status(200).json({
-    result: notices,
-    hits: notices.length,
+    notices,
     totalHits: totalHits,
-
   });
 };
 
@@ -152,11 +158,95 @@ const getNoticesByCategory = async (req, res, next) => {
   }
 };
 
+const getUsersNotices = async (req, res) => {
+  const owner = req.user._id;
+
+  const { page = 1, limit = 12, query = "" } = req.query;
+  const skip = (page - 1) * limit;
+
+  const searchWords = query.trim().split(" ");
+
+  // const regexExpressions = searchWords.map((word) => ({
+  //   titleOfAdd: { $regex: new RegExp(word, "i") },
+  // }));
+
+  const searchQuery = {
+    owner,
+    titleOfAdd: { $in: searchWords },
+    ...req.searchQuery,
+  };
+
+  const notices = await Notice.find(searchQuery, "-createdAt -updateAt", {
+    skip,
+    limit: Number(limit),
+  })
+    .sort({ createdAt: -1 })
+    .populate("owner", "username email phone");
+
+  if (!notices || notices.length === 0) {
+    throw new RequestError(404, "Nothing find for your request");
+  }
+
+  const totalCount = await Notice.countDocuments(searchQuery);
+
+  res.status(200).json({
+    result: notices,
+    hits: notices.length,
+    totalHits: totalCount,
+  });
+};
+const addToFavorite = async (req, res) => {
+  const { _id: userId } = req.user;
+  const { id: noticeId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new RequestError(404, `User with id: ${userId} not found`);
+  }
+  const notice = await Notice.findById(noticeId);
+  if (!notice) {
+    throw new RequestError(404, `notice with id: ${noticeId} not found`);
+  }
+
+  const index = notice.favorite.indexOf(userId);
+
+  if (index !== -1) {
+    return res.json({
+      message: `User with id ${userId} already has this notice  in favorite list`,
+    });
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    { $push: { favorite: noticeId } },
+    { new: true }
+  ).populate(
+    "favorite",
+    "title avatarURL category name location price sex comments"
+  );
+
+  updatedUser.password = undefined;
+
+  const updatedNotice = await Notice.findByIdAndUpdate(
+    noticeId,
+    { $push: { favorite: userId } },
+    { new: true }
+  );
+
+  res.json({
+    result: {
+      updatedNotice,
+    },
+  });
+};
+
 module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
+  addToFavorite: ctrlWrapper(addToFavorite),
   getById: ctrlWrapper(getById),
+  getUsersNotices: ctrlWrapper(getUsersNotices),
   deleteById: ctrlWrapper(deleteById),
-  addNotice: ctrlWrapper(addNotice)
+  addNotice: ctrlWrapper(addNotice),
 };
