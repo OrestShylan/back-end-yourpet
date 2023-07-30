@@ -19,8 +19,10 @@ const getAllPets = async (req, res, next) => {
       updatedAt: -1,
     },
   }).lean();
-
-  res.json({
+  if (!pets) {
+    next(RequestError(404, "No pets for your request"));
+  }
+  res.status(200).json({
     totalResults,
     page,
     totalPages: Math.ceil(totalResults / limit),

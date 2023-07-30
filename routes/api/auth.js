@@ -9,7 +9,7 @@ const {
 } = require("../../schemas/userSchema");
 const validateBody = require("../../middleWares/validateBody");
 const authenticate = require("../../middleWares/authMiddleware");
-const { uploadCloud } = require("../../middleWares");
+const upload = require("../../middleWares/upload");
 
 const router = express.Router();
 
@@ -29,7 +29,7 @@ router.patch(
   "/",
   authenticate,
   validateBody(dataUserSchema),
-  uploadCloud.single("avatars"),
+  upload.single("avatar"),
   authController.updateUserDataCtrl
 );
 

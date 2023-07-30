@@ -21,7 +21,7 @@ router.get("/", authenticate, ctrl.getAllPets);
 router.post(
   "/",
   authenticate,
-  uploadCloud.single("pets"),
+  uploadCloud(schemas.photoConfig),
   validateBody(schemas.addPetJoiSchema),
   ctrl.addPet
 );

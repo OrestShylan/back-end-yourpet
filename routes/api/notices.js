@@ -1,35 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  noticesFilter,
-  authenticate,
-  validateBody,
-} = require("../../middleWares");
+const { noticesFilter, authenticate } = require("../../middleWares");
 const ctrl = require("../../controllers/notices");
 
 router.get("/", ctrl.getAll);
 
 router.get("/notice/:id", ctrl.getById);
 router.get("/search", ctrl.searchByTitle);
-router.get("/:category", noticesFilter, ctrl.searchByTitle);
 
-router.get("/notice/:id", authenticate, ctrl.getById);
-
-router.delete("/:id", authenticate, ctrl.deleteById);
-
-router.post("/owner", authenticate, validateBody, ctrl.addNotice);
-
-router.get("/search", ctrl.searchByTitle);
+router.get("/search/:category", noticesFilter, ctrl.searchByTitle);
 
 router.get("/:categoryName", ctrl.getNoticesByCategory);
-router.get(
-  "/getUsersNotices",
-  authenticate,
-  noticesFilter,
-  ctrl.getUsersNotices
-);
-
-router.post("/favorite/:id", authenticate, ctrl.addToFavorite);
+router.get("/", authenticate, ctrl.getUsersNotices);
 
 module.exports = router;

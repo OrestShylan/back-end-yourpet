@@ -1,6 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { RequestError } = require("../helpers");
 require("dotenv").config();
 
 cloudinary.config({
@@ -8,22 +9,47 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_KEY,
   api_secret: process.env.CLOUDINARY_SECRET,
 });
-
-cloudinary.uploader
-  .upload("my_image.jpg")
-  .then((result) => console.log(result));
-
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: "avatars",
-    allowedFormats: ["jpg", "png"],
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    folder: (req, file) => req.fileConfig.folder,
+    allowed_formats: ["jpg", "png", "bmp"],
+    format: (req, file) => (file.mimetype === "image/png" ? "png" : "jpg"),
   },
 });
 
-const uploadCloud = multer({ storage });
+const allowedMimes = ["image/jpeg", "image/png", "image/bmp"];
 
-module.exports = { cloudinary, uploadCloud };
+const fileFilter = (req, file, cb) => {
+  if (allowedMimes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(
+      new RequestError(
+        400,
+        "Unsupported file type. Please load file types such as : jpeg, png, bmp"
+      )
+    );
+  }
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 3 * 1024 * 1024,
+  },
+});
+
+const uploadCloud = ({ field, ...restConfig }) => {
+  const uploadMiddleware = upload.single(field);
+
+  return (req, res, next) => {
+    req.fileConfig = restConfig;
+    uploadMiddleware(req, res, (err) => {
+      next(err && new RequestError(err.status || 400, err.message));
+    });
+  };
+};
+
+module.exports = uploadCloud;
