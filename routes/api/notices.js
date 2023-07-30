@@ -7,6 +7,7 @@ const {
   validateBody,
 } = require("../../middleWares");
 const ctrl = require("../../controllers/notices");
+const noticeSchema = require('../../schemas/noticeSchema')
 
 router.get("/", ctrl.getAll);
 
@@ -18,7 +19,10 @@ router.get("/notice/:id", authenticate, ctrl.getById);
 
 router.delete("/:id", authenticate, ctrl.deleteById);
 
-router.post("/owner", authenticate, validateBody, ctrl.addNotice);
+
+router.post('/owner', authenticate, validateBody(noticeSchema), ctrl.addNotice)
+
+
 
 router.get("/search", ctrl.searchByTitle);
 
