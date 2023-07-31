@@ -201,14 +201,12 @@ const getFavoriteNotices = async (req, res) => {
     throw new RequestError(404, `User with id: ${ownerId} is not found`);
   }
 
-  console.log(user);
-
   const favoriteNotices = user.favorite;
 
   const searchWords = query.trim().split(" ");
 
   const regexExpressions = searchWords.map((word) => ({
-    titleOfAdd: { $regex: new RegExp(word, "i") },
+    title: { $regex: new RegExp(word, "i") },
   }));
 
   const searchQuery = {
@@ -225,7 +223,7 @@ const getFavoriteNotices = async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .populate("owner", "username email phone");
+    .populate("owner", "user email phone");
 
   const totalCount = await Notice.countDocuments(searchQuery);
 

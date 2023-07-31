@@ -97,7 +97,8 @@ const updateUserData = async (
 ) => {
   const updatedUser = await User.findByIdAndUpdate(
     { _id },
-    { avatarURL, name, email, birthday, phone, city }
+    { avatarURL, name, email, birthday, phone, city },
+    { new: true }
   );
   return updatedUser;
 };

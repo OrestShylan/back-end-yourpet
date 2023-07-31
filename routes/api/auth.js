@@ -28,8 +28,8 @@ router.get("/current", authenticate, authController.getCurrentCtrl);
 router.patch(
   "/",
   authenticate,
+  upload.single("avatarURL"),
   validateBody(dataUserSchema),
-  upload.single("avatar"),
   authController.updateUserDataCtrl
 );
 

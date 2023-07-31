@@ -16,7 +16,6 @@ router.post("/favorite/:id", authenticate, ctrl.addToFavorite);
 router.delete("/favorite/:id", authenticate, ctrl.removeFromFavorite);
 
 router.get("/notice/:id", ctrl.getById);
-// router.get("/search", ctrl.searchByTitle);
 router.get("/:category", noticesFilter, ctrl.searchByTitle);
 
 router.get("/notice/:id", authenticate, ctrl.getById);
