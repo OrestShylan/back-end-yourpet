@@ -22,9 +22,8 @@ const petsSchema = new Schema(
     },
     avatarURL: {
       type: String,
-      default: "",
+      default: null,
     },
-
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
