@@ -41,7 +41,7 @@ const getAll = async (req, res, next) => {
       .skip(skip)
       .limit(limit)
       .sort({ updateAt: -1 })
-      .populate("owner");
+      .populate("owner", "email phone");
 
     if (!result || result.length === 0) {
       return res.status(404).json({
@@ -121,7 +121,9 @@ const searchByTitle = async (req, res) => {
   const notices = await Notice.find(searchQuery, "-createdAt -updatedAt", {
     skip,
     limit: Number(limit),
-  }).sort({ createdAt: -1 });
+  })
+    .populate("owner", "email phone")
+    .sort({ createdAt: -1 });
 
   const totalHits = await Notice.countDocuments(searchQuery);
 
@@ -141,6 +143,7 @@ const getNoticesByCategory = async (req, res, next) => {
     const foundNotices = await Notice.find({ category: categoryName })
       .skip(skip)
       .limit(limit)
+      .populate("owner", "email phone")
       .sort({ createdAt: -1 });
 
     if (foundNotices.length === 0) {
@@ -175,7 +178,7 @@ const getUsersNotices = async (req, res, next) => {
       updatedAt: -1,
     },
   })
-    .populate("owner")
+    .populate("owner", "email phone")
     .lean();
 
   if (!notices) {
@@ -201,6 +204,8 @@ const getFavoriteNotices = async (req, res) => {
     throw new RequestError(404, `User with id: ${ownerId} is not found`);
   }
 
+  console.log(user);
+
   const favoriteNotices = user.favorite;
 
   const searchWords = query.trim().split(" ");
@@ -223,7 +228,7 @@ const getFavoriteNotices = async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .populate("owner", "user email phone");
+    .populate("owner", "email phone");
 
   const totalCount = await Notice.countDocuments(searchQuery);
 
