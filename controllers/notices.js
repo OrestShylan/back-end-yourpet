@@ -167,7 +167,7 @@ const getUsersNotices = async (req, res, next) => {
   const { page = 1, limit = 12 } = query;
   const skip = (page - 1) * limit;
 
-  const totalResults = await Notice.find({ owner: userId }).countDocuments();
+  const totalResults = await Notice.find({ owner: userId }).count();
   const notices = await Notice.find({ owner: userId }, null, {
     skip,
     limit,
@@ -182,7 +182,7 @@ const getUsersNotices = async (req, res, next) => {
     next(RequestError(404, "Not found"));
   }
 
-  res.status(200).json({
+  res.json({
     totalResults,
     page,
     totalPages: Math.ceil(totalResults / limit),

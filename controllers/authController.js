@@ -63,6 +63,42 @@ const updateUserDataCtrl = async (req, res) => {
   res.json(updatedUser);
 };
 
+// const updateUserDataCtrl = async (req, res) => {
+//   const { _id } = req.user;
+//   const { name, email, birthday, phone, city } = req.body;
+
+//   try {
+//     upload.single("avatar")(req, res, async (err) => {
+//       if (err) {
+//         console.log(err);
+//         return res.status(500).json({ error: "File upload failed" });
+//       }
+
+//       const avatarURL = req.file ? req.file.path : undefined;
+
+//       const updatedUser = await updateUserData(
+//         req,
+//         _id,
+//         avatarURL,
+//         name,
+//         email,
+//         birthday,
+//         phone,
+//         city
+//       );
+
+//       if (!updatedUser) {
+//         return res.status(401).json({ error: "Not authorized" });
+//       }
+
+//       res.json(updatedUser);
+//     });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// };
+
 module.exports = {
   registerCtrl: ctrlWrapper(registerCtrl),
   loginCtrl: ctrlWrapper(loginCtrl),

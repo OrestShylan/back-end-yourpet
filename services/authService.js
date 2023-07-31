@@ -102,4 +102,22 @@ const updateUserData = async (
   return updatedUser;
 };
 
+// const updateUserData = async (req, _id, name, email, birthday, phone, city) => {
+//   if (req.file) {
+//     const avatarURL = req.file.path;
+
+//     const updatedUser = await User.findByIdAndUpdate(
+//       { _id },
+//       { avatarURL, name, email, birthday, phone, city }
+//     );
+//     return updatedUser;
+//   } else {
+//     const updatedUser = await User.findByIdAndUpdate(
+//       { _id },
+//       { name, email, birthday, phone, city }
+//     );
+//     return updatedUser;
+//   }
+// };
+
 module.exports = { register, login, logout, updateUserData };
