@@ -1,6 +1,6 @@
 const { ctrlWrapper, RequestError } = require("../helpers");
 const { Notice } = require("../models/noticesModel");
-const { User } = require("../models/userModel");
+const User = require("../models/userModel");
 
 const addNotice = async (req, res, next) => {
   try {
@@ -190,11 +190,57 @@ const getUsersNotices = async (req, res, next) => {
   });
 };
 
+const getFavoriteNotices = async (req, res) => {
+  const { _id: ownerId } = req.user;
+
+  const { page = 1, limit = 12, query = "" } = req.query;
+  const skip = (page - 1) * limit;
+
+  const user = await User.findById(ownerId);
+  if (!user) {
+    throw new RequestError(404, `User with id: ${ownerId} is not found`);
+  }
+
+  console.log(user);
+
+  const favoriteNotices = user.favorite;
+
+  const searchWords = query.trim().split(" ");
+
+  const regexExpressions = searchWords.map((word) => ({
+    titleOfAdd: { $regex: new RegExp(word, "i") },
+  }));
+
+  const searchQuery = {
+    $and: [
+      { _id: { $in: favoriteNotices } },
+      {
+        $or: regexExpressions,
+      },
+    ],
+    ...req.searchQuery,
+  };
+
+  const notices = await Notice.find(searchQuery, "-favorite")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate("owner", "username email phone");
+
+  const totalCount = await Notice.countDocuments(searchQuery);
+
+  res.status(200).json({
+    notices: notices,
+    totalHits: totalCount,
+  });
+};
+
 const addToFavorite = async (req, res) => {
   const { _id: userId } = req.user;
   const { id: noticeId } = req.params;
 
-  const user = await User.findById(userId);
+  const user = await User.findOne(userId);
+
   if (!user) {
     throw new RequestError(404, `User with id: ${userId} not found`);
   }
@@ -207,7 +253,7 @@ const addToFavorite = async (req, res) => {
 
   if (index !== -1) {
     return res.json({
-      message: `User with id ${userId} already has this notice  in favorite list`,
+      message: `User with id ${userId} already has this notice in favorite list`,
     });
   }
 
@@ -227,6 +273,8 @@ const addToFavorite = async (req, res) => {
     { $push: { favorite: userId } },
     { new: true }
   );
+
+  console.log(updatedNotice);
 
   res.json({
     result: {
@@ -269,6 +317,7 @@ module.exports = {
   searchByTitle: ctrlWrapper(searchByTitle),
   getNoticesByCategory: ctrlWrapper(getNoticesByCategory),
   getAll: ctrlWrapper(getAll),
+  getFavoriteNotices: ctrlWrapper(getFavoriteNotices),
   addToFavorite: ctrlWrapper(addToFavorite),
   removeFromFavorite: ctrlWrapper(removeFromFavorite),
   getById: ctrlWrapper(getById),

@@ -11,16 +11,13 @@ const noticeSchema = require("../../schemas/noticeSchema");
 
 router.get("/", ctrl.getAll);
 
-router.get("/notice/:id", ctrl.getById);
-router.get("/search", ctrl.searchByTitle);
-
-router.get("/search/:category", noticesFilter, ctrl.searchByTitle);
-
-router.get("/:categoryName", ctrl.getNoticesByCategory);
-
-router.get("/:category", noticesFilter, ctrl.searchByTitle);
+router.get("/favorite", authenticate, noticesFilter, ctrl.getFavoriteNotices);
 router.post("/favorite/:id", authenticate, ctrl.addToFavorite);
 router.delete("/favorite/:id", authenticate, ctrl.removeFromFavorite);
+
+router.get("/notice/:id", ctrl.getById);
+// router.get("/search", ctrl.searchByTitle);
+router.get("/:category", noticesFilter, ctrl.searchByTitle);
 
 router.get("/notice/:id", authenticate, ctrl.getById);
 
@@ -29,6 +26,6 @@ router.delete("/:id", authenticate, ctrl.deleteById);
 router.post("/owner", authenticate, validateBody(noticeSchema), ctrl.addNotice);
 
 router.get("/:categoryName", ctrl.getNoticesByCategory);
-router.get("/user/own", authenticate, noticesFilter, ctrl.getUsersNotices);
+router.get("/", authenticate, noticesFilter, ctrl.getUsersNotices);
 
 module.exports = router;
