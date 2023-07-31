@@ -55,7 +55,7 @@ const getCurrentCtrl = async (req, res) => {
 const updateUserDataCtrl = async (req, res) => {
   const { _id } = req.user;
   const { name, email, birthday, phone, city } = req.body;
-  const avatarURL = req.file.path;
+  const avatarURL = req.file ? req.file.path : null;
 
   const updatedUser = await updateUserData(
     _id,
