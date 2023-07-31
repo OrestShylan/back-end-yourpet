@@ -1,4 +1,4 @@
-const { ctrlWrapper, RequestError } = require("../helpers");
+const { ctrlWrapper, RequestError, removeFromCloud } = require("../helpers");
 
 const { Pet } = require("../models/petsModel");
 
@@ -50,27 +50,6 @@ const addPet = async (req, res, next) => {
     message: "Your pet was succesfully added",
     pet,
   });
-  // const { _id: owner } = req.user;
-
-  // if (!req.body) {
-  //   throw new RequestError(400, "Please fill in your text fields");
-  // }
-
-  // let avatarURL = null;
-
-  // if (req.file) {
-  //   avatarURL = req.file.path;
-  // }
-
-  // const result = await Pet.create({
-  //   ...req.body,
-  //   avatarURL,
-  //   owner,
-  // });
-  // res.status(201).json({
-  //   message: "Your pet was succesfully added",
-  //   result,
-  // });
 };
 
 const deletePet = async (req, res) => {
@@ -82,6 +61,8 @@ const deletePet = async (req, res) => {
   if (!pet) {
     throw new RequestError(404, "Pet wasn't found");
   }
+
+  removeFromCloud(pet.avatarURL);
 
   res.status(200).json({
     message: "Your pet was removed from your account",
