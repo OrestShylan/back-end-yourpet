@@ -157,48 +157,43 @@ const getNoticesByCategory = async (req, res, next) => {
 };
 
 const getUsersNotices = async (req, res, next) => {
-  try {
-    const { _id: owner } = req.user;
+  const { _id: owner } = req.user;
 
-    const { page = 1, limit = 12, query = "" } = req.query;
-    const skip = (page - 1) * limit;
+  const { page = 1, limit = 12, query = "" } = req.query;
+  const skip = (page - 1) * limit;
 
-    const searchWords = query.trim().split(" ");
+  const searchWords = query.trim().split(" ");
 
-    const regexExpressions = searchWords.map((word) => ({
-      title: { $regex: new RegExp(word, "i") },
-    }));
+  const regexExpressions = searchWords.map((word) => ({
+    titleOfAdd: { $regex: new RegExp(word, "i") },
+  }));
 
-    const searchQuery = {
-      $and: [
-        { owner: { $eq: owner } },
-        {
-          $or: regexExpressions,
-        },
-      ],
-      ...req.searchQuery,
-    };
-    const totalCount = await Notice.countDocuments(searchQuery);
+  const searchQuery = {
+    $and: [
+      { owner },
+      {
+        $or: regexExpressions,
+      },
+    ],
+    ...req.searchQuery,
+  };
 
-    const notices = await Notice.find(searchQuery, "-createdAt - updatedAt", {
-      skip,
-      limit: Number(limit),
-    })
-      .sort({ createdAt: -1 })
-      .populate("owner", "name email phone");
+  const notices = await Notice.find(searchQuery, "-createdAt -updatedAt", {
+    skip,
+    limit: Number(limit),
+  })
+    .sort({ createdAt: -1 })
+    .populate("owner", "username email phone");
 
-    if (!notices || notices.length === 0) {
-      throw new RequestError(404, " No match for your request");
-    }
-
-    res.status(200).json({
-      result: notices,
-      hits: notices.length,
-      totalHits: totalCount,
-    });
-  } catch (error) {
-    next(error);
+  if (!notices) {
+    throw new RequestError(404, `no match for your request`);
   }
+  const totalCount = await Notice.countDocuments(searchQuery);
+
+  res.status(200).json({
+    notices: notices,
+    totalHits: totalCount,
+  });
 };
 
 const getFavoriteNotices = async (req, res) => {
