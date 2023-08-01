@@ -329,7 +329,7 @@
         }
       }
     },
-    "/notices/owner": {
+    "/notices/my-ads": {
       "get": {
         "tags": ["Notices"],
         "summary": "Get notices for owner",
