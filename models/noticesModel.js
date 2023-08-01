@@ -80,6 +80,7 @@ const addSchema = Joi.object({
   location: Joi.string(),
   price: Joi.string(),
   comments: Joi.string(),
+  avatarURL: Joi.string(),
   favorite: [{ type: Schema.Types.ObjectId, ref: "user" }],
 });
 

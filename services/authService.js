@@ -15,7 +15,7 @@ const register = async (name, email, password) => {
     name,
     email,
     password,
-    avatarURL: defaultAvatar,
+    avatar: defaultAvatar,
   });
 
   newUser.password = undefined;
@@ -27,7 +27,7 @@ const register = async (name, email, password) => {
     user: {
       name: newUser.name,
       email: newUser.email,
-      avatarURL: newUser.avatarURL,
+      avatar: newUser.avatar,
     },
   };
 };
@@ -67,7 +67,7 @@ const logout = async (_id) => {
 
 const updateUserData = async (
   _id,
-  avatarURL,
+  avatar,
   name,
   email,
   birthday,
@@ -76,7 +76,7 @@ const updateUserData = async (
 ) => {
   const updatedUser = await User.findByIdAndUpdate(
     { _id },
-    { avatarURL, name, email, birthday, phone, city },
+    { avatar, name, email, birthday, phone, city },
     { new: true }
   );
   return updatedUser;

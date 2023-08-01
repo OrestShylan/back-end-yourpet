@@ -11,7 +11,6 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: async (req, file) => {
-    // Determine the folder based on file properties or request data
     let folder;
 
     const userID = req.user._id.toString();
@@ -27,12 +26,8 @@ const storage = new CloudinaryStorage({
     }
     return {
       folder: folder,
-      allowed_formats: ["jpg", "jpeg", "png"], // Adjust the allowed formats as needed
-      public_id: uniqueImgName, // Use original filename as the public ID
-      // transformation: [
-      //   { width: 350, height: 350 },
-      //   { width: 700, height: 700 },
-      // ],
+      allowed_formats: ["jpg", "jpeg", "png"],
+      public_id: uniqueImgName,
     };
   },
 });

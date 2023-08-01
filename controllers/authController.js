@@ -38,11 +38,11 @@ const logoutCtrl = async (req, res) => {
 };
 
 const getCurrentCtrl = async (req, res) => {
-  const { _id, avatarURL, name, email, birthday, phone, city, favorite } =
+  const { _id, avatar, name, email, birthday, phone, city, favorite } =
     req.user;
   res.json({
     id: _id,
-    avatarURL,
+    avatar,
     name,
     email,
     birthday,
@@ -55,11 +55,11 @@ const getCurrentCtrl = async (req, res) => {
 const updateUserDataCtrl = async (req, res) => {
   const { _id } = req.user;
   const { name, email, birthday, phone, city } = req.body;
-  const avatarURL = req.file ? req.file.path : null;
+  const avatar = req.file ? req.file.path : null;
 
   const updatedUser = await updateUserData(
     _id,
-    avatarURL,
+    avatar,
     name,
     email,
     birthday,
