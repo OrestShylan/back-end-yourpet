@@ -60,12 +60,12 @@ const loginSchema = Joi.object({
 // });
 
 const dataUserSchema = Joi.object({
-  avatarURL: Joi.string(),
+  avatarURL: Joi.string().allow(null),
   name: Joi.string(),
   email: Joi.string().email().required(),
   birthday: Joi.date().allow(null),
-  phone: Joi.string(),
-  city: Joi.string(),
+  phone: Joi.string().allow(""),
+  city: Joi.string().allow(""),
 });
 
 module.exports = { registerSchema, loginSchema, dataUserSchema };
