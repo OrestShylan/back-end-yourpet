@@ -10,8 +10,6 @@ const {
 const ctrl = require("../../controllers/notices");
 const noticeSchema = require("../../schemas/noticeSchema");
 
-// router.get("/", ctrl.getAll);
-
 router.get("/my-ads", authenticate, noticesFilter, ctrl.getUsersNotices);
 
 router.get("/favorite", authenticate, noticesFilter, ctrl.getFavoriteNotices);

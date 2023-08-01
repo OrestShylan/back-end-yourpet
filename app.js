@@ -36,8 +36,6 @@ app.use("/api/notices", noticesRouter);
 app.use("/api/pets", petsRouter);
 app.use("/api/friends", friendsRouter);
 app.use('/api/news', newsRouter)
-
-
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use((req, res) => {
