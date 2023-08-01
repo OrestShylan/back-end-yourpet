@@ -188,7 +188,6 @@ const getUsersNotices = async (req, res, next) => {
       .populate("owner", "name email phone");
 
     if (!notices || notices.length === 0) {
-      console.log("111");
       throw new RequestError(404, " No match for your request");
     }
 
