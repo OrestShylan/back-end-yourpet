@@ -11,7 +11,10 @@
   },
   "consumes": ["application/json", "multipart/form-data"],
   "produces": ["application/json"],
-  "servers": [{ "url": "http://localhost:3000/api-docs" }],
+  "servers": [
+    { "url": "http://localhost:3000/api-docs" },
+    { "url": "https://back-end-yourpet.onrender.com/api-docs" }
+  ],
   "tags": [
     {
       "name": "Users",
@@ -584,7 +587,7 @@
       }
     },
     "/notices/favorite/delete/{id}": {
-      "patch": {
+      "delete": {
         "tags": ["Notices"],
         "summary": "Delete notice to favorite",
         "security": [{ "Bearer": [] }],
@@ -921,7 +924,7 @@
           "name": {
             "type": "string",
             "description": "User's name",
-            "example": "Natalia"
+            "example": "Joe"
           },
           "email": {
             "type": "string",
@@ -1166,6 +1169,11 @@
               "type": "string",
               "description": "id",
               "example": "63d7b0396656072a3ad82e88"
+            },
+
+            "favorite": {
+              "type": "string",
+              "example": "true"
             },
             "title": {
               "type": "string",
@@ -1477,7 +1485,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "example": "Barsik",
+            "example": "Joe",
             "description": "Pet name",
             "minLength": 2,
             "maxLength": 40
@@ -1505,7 +1513,7 @@
           },
           "avatar": {
             "type": "string",
-            "example": "https://www.purina.co.uk/sites/default/files/styles/",
+            "example": "https://example.com/pet.jpg",
             "description": "Set avatar link for your pet",
             "minlength": 4,
             "maxlength": 10
@@ -1537,7 +1545,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "example": "Barsik",
+            "example": "Joe",
             "description": "Pet name",
             "minLength": 2,
             "maxLength": 40
@@ -1565,7 +1573,7 @@
           },
           "avatar": {
             "type": "string",
-            "example": "https://www.purina.co.uk/sites/default/files/styles/",
+            "example": "https://example.com/pet.jpg",
             "description": "Set avatar link for your pet",
             "minlength": 4,
             "maxlength": 10
