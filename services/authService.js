@@ -65,27 +65,6 @@ const logout = async (_id) => {
   return resultLogout;
 };
 
-// const updateUserData = async (req, res) => {
-//   const { _id } = req.user;
-//   const data = await User.findByIdAndUpdate(
-//     _id,
-//     { ...req.body, ...req.file },
-//     { new: true }
-//   );
-//   if (!data) {
-//     throw RequestError(404, "Not found");
-//   }
-
-//   try {
-//     if (req.file) {
-//       await User.findByIdAndUpdate(_id, { avatarURL: req.file.path });
-//     }
-//   } catch (error) {
-//     throw error;
-//   }
-
-//   res.status(200).json({ message: "User profile updated successfully" });
-// };
 const updateUserData = async (
   _id,
   avatarURL,
@@ -102,23 +81,5 @@ const updateUserData = async (
   );
   return updatedUser;
 };
-
-// const updateUserData = async (req, _id, name, email, birthday, phone, city) => {
-//   if (req.file) {
-//     const avatarURL = req.file.path;
-
-//     const updatedUser = await User.findByIdAndUpdate(
-//       { _id },
-//       { avatarURL, name, email, birthday, phone, city }
-//     );
-//     return updatedUser;
-//   } else {
-//     const updatedUser = await User.findByIdAndUpdate(
-//       { _id },
-//       { name, email, birthday, phone, city }
-//     );
-//     return updatedUser;
-//   }
-// };
 
 module.exports = { register, login, logout, updateUserData };

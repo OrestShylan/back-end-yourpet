@@ -1,7 +1,6 @@
 const Joi = require("joi");
 
 const namePatern = /^[A-Za-z]{2,16}$/;
-const birthdayPatern = /^(0[1-9]|[12]\d|3[01])-(0[1-9]|1[0-2])-\d{4}$/;
 const cityPatern = /^[A-Za-z\s]+(?:,\s*[A-Za-z\s]+)*$/;
 
 const noticeSchema = Joi.object({
@@ -21,42 +20,9 @@ const noticeSchema = Joi.object({
     "string.base": "The name must be a string of 2 to 16 symbols.",
     "any.required": "The name field is required.",
   }),
-  date: Joi.string()
-    .pattern(birthdayPatern)
-    .required()
-    .messages({
-      "any.required": "The birthday field is required.",
-      "string.pattern.base": "The birthday must be in format DD-MM-YYYY.",
-    })
-    .custom((value, helpers) => {
-      const [day, month, year] = value.split("-");
-      const dateObj = new Date(`${year}-${month}-${day}`);
-
-      if (isNaN(dateObj.getTime())) {
-        return helpers.error("any.invalid", {
-          message: "Invalid birthday format. Please use DD-MM-YYYY.",
-        });
-      }
-
-      const isValidDate =
-        dateObj.getDate() === parseInt(day, 10) &&
-        dateObj.getMonth() + 1 === parseInt(month, 10) &&
-        dateObj.getFullYear() === parseInt(year, 10);
-      if (!isValidDate) {
-        return helpers.error("any.invalid", {
-          message: "Invalid birthday date. Please enter a valid date.",
-        });
-      }
-
-      const currentDate = new Date();
-      if (dateObj > currentDate) {
-        return helpers.error("any.invalid", {
-          message: "Birthday date cannot be in the future.",
-        });
-      }
-
-      return value;
-    }, "custom validation"),
+  date: Joi.date().max("now").required().messages({
+    "any.required": "Set birthday for notice",
+  }),
   type: Joi.string().min(2).max(16).required().messages({
     "string.base": "The type must be a string of 2 to 16 symbols.",
     "any.required": "The type field is required.",
