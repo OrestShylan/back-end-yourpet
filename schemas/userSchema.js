@@ -39,7 +39,7 @@ const loginSchema = Joi.object({
 });
 
 const dataUserSchema = Joi.object({
-  avatarURL: Joi.string().allow(null),
+  avatar: Joi.string().allow(null),
   name: Joi.string(),
   email: Joi.string().email().required(),
   birthday: Joi.date().allow(null),

@@ -19,12 +19,13 @@ const getAllPets = async (req, res, next) => {
       updatedAt: -1,
     },
   })
-    .populate("owner")
+    .populate("owner", "name email phone")
     .lean();
 
-  if (!pets) {
-    next(RequestError(404, "No pets for your request"));
+  if (!pets || pets.length === 0) {
+    return next(new RequestError(404, "No pets for your request"));
   }
+
   res.status(200).json({
     totalResults,
     page,
