@@ -3,32 +3,27 @@ const { Notice } = require("../models/noticesModel");
 const User = require("../models/userModel");
 
 const addNotice = async (req, res, next) => {
-  try {
-    const { _id: owner } = req.user;
-    const file = req.file.path;
-    const { title, content } = req.body;
-    const noticeData = { title, content, file, owner };
-    const result = await Notice.create(noticeData);
+  const { _id: owner } = req.user;
 
-    // const addNotice = async (req, res, next) => {
-    // console.log('hi');
-    //   try {
-    //     const { _id: owner } = req.user;
-    //     const file = req.file.path;
-    //     const { title, content } = req.body;
-    //     const noticeData = { title, content, file, owner };
-    //     const result = await Notice.create(noticeData);
+  const { category } = req.params;
 
-    //     res.status(201).json(result.toObject());
-    //   } catch (error) {
-    //     next(error);
-    //   }
-    // };
+  const notice = await Notice.create({
+    ...req.body,
+    owner,
+    category,
+    avatarURL: req.file.path,
+  });
 
-    res.status(201).json(result.toObject());
-  } catch (error) {
-    next(error);
+  if (!req.file) {
+    throw new RequestError(400, "Please upload file");
   }
+
+  if (!notice) {
+    throw new RequestError(400, "Error: notice is not created");
+  }
+  res.status(201).json({
+    result: notice,
+  });
 };
 
 const getAll = async (req, res, next) => {
@@ -162,33 +157,48 @@ const getNoticesByCategory = async (req, res, next) => {
 };
 
 const getUsersNotices = async (req, res, next) => {
-  const {
-    user: { _id: userId },
-    query,
-  } = req;
+  try {
+    const { _id: owner } = req.user;
 
-  const { page = 1, limit = 12 } = query;
-  const skip = (page - 1) * limit;
+    const { page = 1, limit = 12, query = "" } = req.query;
+    const skip = (page - 1) * limit;
 
-  const totalHits = await Notice.find({ owner: userId }).count();
-  const notices = await Notice.find({ owner: userId }, null, {
-    skip,
-    limit,
-    sort: {
-      updatedAt: -1,
-    },
-  })
-    .populate("owner", "email phone")
-    .lean();
+    const searchWords = query.trim().split(" ");
 
-  if (!notices) {
-    next(RequestError(404, "Not found"));
+    const regexExpressions = searchWords.map((word) => ({
+      title: { $regex: new RegExp(word, "i") },
+    }));
+
+    const searchQuery = {
+      $and: [
+        { owner: { $eq: owner } },
+        {
+          $or: regexExpressions,
+        },
+      ],
+      ...req.searchQuery,
+    };
+    const totalCount = await Notice.countDocuments(searchQuery);
+
+    const notices = await Notice.find(searchQuery, "-createdAt - updatedAt", {
+      skip,
+      limit: Number(limit),
+    })
+      .sort({ createdAt: -1 })
+      .populate("owner", "name email phone");
+
+    if (!notices || notices.length === 0) {
+      throw new RequestError(404, " No match for your request");
+    }
+
+    res.status(200).json({
+      result: notices,
+      hits: notices.length,
+      totalHits: totalCount,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  res.json({
-    totalHits,
-    notices: notices,
-  });
 };
 
 const getFavoriteNotices = async (req, res) => {
