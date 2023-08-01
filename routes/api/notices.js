@@ -11,6 +11,8 @@ const noticeSchema = require("../../schemas/noticeSchema");
 
 router.get("/", ctrl.getAll);
 
+router.get("/my-pets", authenticate, noticesFilter, ctrl.getUsersNotices);
+
 router.get("/favorite", authenticate, noticesFilter, ctrl.getFavoriteNotices);
 router.post("/favorite/:id", authenticate, ctrl.addToFavorite);
 router.delete("/favorite/:id", authenticate, ctrl.removeFromFavorite);

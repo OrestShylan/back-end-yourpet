@@ -170,7 +170,7 @@ const getUsersNotices = async (req, res, next) => {
   const { page = 1, limit = 12 } = query;
   const skip = (page - 1) * limit;
 
-  const totalResults = await Notice.find({ owner: userId }).count();
+  const totalHits = await Notice.find({ owner: userId }).count();
   const notices = await Notice.find({ owner: userId }, null, {
     skip,
     limit,
@@ -186,10 +186,8 @@ const getUsersNotices = async (req, res, next) => {
   }
 
   res.json({
-    totalResults,
-    page,
-    totalPages: Math.ceil(totalResults / limit),
-    results: notices,
+    totalHits,
+    notices: notices,
   });
 };
 
