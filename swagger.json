@@ -551,7 +551,7 @@
       }
     },
     "/notices/favorite/add/{id}": {
-      "patch": {
+      "post": {
         "tags": ["Notices"],
         "summary": "Add notice to favorite",
         "security": [{ "Bearer": [] }],
