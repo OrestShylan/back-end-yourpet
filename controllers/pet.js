@@ -18,7 +18,10 @@ const getAllPets = async (req, res, next) => {
     sort: {
       updatedAt: -1,
     },
-  }).lean();
+  })
+    .populate("owner")
+    .lean();
+
   if (!pets) {
     next(RequestError(404, "No pets for your request"));
   }

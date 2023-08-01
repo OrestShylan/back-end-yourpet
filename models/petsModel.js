@@ -8,9 +8,9 @@ const petsSchema = new Schema(
       type: String,
       required: [true, "Pet name is required"],
     },
-    birthday: {
-      type: String,
-      required: [true, "Pet birthday is required"],
+    date: {
+      type: Date,
+      required: [true, "Birthday is required"],
     },
     type: {
       type: String,
@@ -27,6 +27,7 @@ const petsSchema = new Schema(
     owner: {
       type: Schema.Types.ObjectId,
       ref: "user",
+      required: true,
     },
   },
   { timestamps: true, versionKey: false }
@@ -38,7 +39,7 @@ const Pet = model("Pet", petsSchema);
 
 const addPetJoiSchema = Joi.object().keys({
   name: Joi.string().min(2).max(16).required(),
-  birthday: Joi.string().required(),
+  date: Joi.date().max("now").required(),
   type: Joi.string().min(2).max(16).required(),
   comments: Joi.string().min(0).max(120).required(),
   avatarURL: Joi.string(),

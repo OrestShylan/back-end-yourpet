@@ -3,32 +3,27 @@ const { Notice } = require("../models/noticesModel");
 const User = require("../models/userModel");
 
 const addNotice = async (req, res, next) => {
-  try {
-    const { _id: owner } = req.user;
-    const file = req.file.path;
-    const { title, content } = req.body;
-    const noticeData = { title, content, file, owner };
-    const result = await Notice.create(noticeData);
+  const { _id: owner } = req.user;
 
-    // const addNotice = async (req, res, next) => {
-    // console.log('hi');
-    //   try {
-    //     const { _id: owner } = req.user;
-    //     const file = req.file.path;
-    //     const { title, content } = req.body;
-    //     const noticeData = { title, content, file, owner };
-    //     const result = await Notice.create(noticeData);
+  const { category } = req.params;
 
-    //     res.status(201).json(result.toObject());
-    //   } catch (error) {
-    //     next(error);
-    //   }
-    // };
+  const notice = await Notice.create({
+    ...req.body,
+    owner,
+    category,
+    avatarURL: req.file.path,
+  });
 
-    res.status(201).json(result.toObject());
-  } catch (error) {
-    next(error);
+  if (!req.file) {
+    throw new RequestError(400, "Please upload file");
   }
+
+  if (!notice) {
+    throw new RequestError(400, "Error: notice is not created");
+  }
+  res.status(201).json({
+    result: notice,
+  });
 };
 
 const getAll = async (req, res, next) => {
@@ -41,7 +36,7 @@ const getAll = async (req, res, next) => {
       .skip(skip)
       .limit(limit)
       .sort({ updateAt: -1 })
-      .populate("owner");
+      .populate("owner", "email phone");
 
     if (!result || result.length === 0) {
       return res.status(404).json({
@@ -121,7 +116,9 @@ const searchByTitle = async (req, res) => {
   const notices = await Notice.find(searchQuery, "-createdAt -updatedAt", {
     skip,
     limit: Number(limit),
-  }).sort({ createdAt: -1 });
+  })
+    .populate("owner", "email phone")
+    .sort({ createdAt: -1 });
 
   const totalHits = await Notice.countDocuments(searchQuery);
 
@@ -141,6 +138,7 @@ const getNoticesByCategory = async (req, res, next) => {
     const foundNotices = await Notice.find({ category: categoryName })
       .skip(skip)
       .limit(limit)
+      .populate("owner", "email phone")
       .sort({ createdAt: -1 });
 
     if (foundNotices.length === 0) {
@@ -159,34 +157,42 @@ const getNoticesByCategory = async (req, res, next) => {
 };
 
 const getUsersNotices = async (req, res, next) => {
-  const {
-    user: { _id: userId },
-    query,
-  } = req;
+  const { _id: owner } = req.user;
 
-  const { page = 1, limit = 12 } = query;
+  const { page = 1, limit = 12, query = "" } = req.query;
   const skip = (page - 1) * limit;
 
-  const totalResults = await Notice.find({ owner: userId }).count();
-  const notices = await Notice.find({ owner: userId }, null, {
+  const searchWords = query.trim().split(" ");
+
+  const regexExpressions = searchWords.map((word) => ({
+    titleOfAdd: { $regex: new RegExp(word, "i") },
+  }));
+
+  const searchQuery = {
+    $and: [
+      { owner },
+      {
+        $or: regexExpressions,
+      },
+    ],
+    ...req.searchQuery,
+  };
+
+  const notices = await Notice.find(searchQuery, "-createdAt -updatedAt", {
     skip,
-    limit,
-    sort: {
-      updatedAt: -1,
-    },
+    limit: Number(limit),
   })
-    .populate("owner")
-    .lean();
+    .sort({ createdAt: -1 })
+    .populate("owner", "username email phone");
 
   if (!notices) {
-    next(RequestError(404, "Not found"));
+    throw new RequestError(404, `no match for your request`);
   }
+  const totalCount = await Notice.countDocuments(searchQuery);
 
-  res.json({
-    totalResults,
-    page,
-    totalPages: Math.ceil(totalResults / limit),
-    results: notices,
+  res.status(200).json({
+    notices: notices,
+    totalHits: totalCount,
   });
 };
 
@@ -200,6 +206,8 @@ const getFavoriteNotices = async (req, res) => {
   if (!user) {
     throw new RequestError(404, `User with id: ${ownerId} is not found`);
   }
+
+  console.log(user);
 
   const favoriteNotices = user.favorite;
 
@@ -223,7 +231,7 @@ const getFavoriteNotices = async (req, res) => {
     .sort({ createdAt: -1 })
     .skip(skip)
     .limit(limit)
-    .populate("owner", "user email phone");
+    .populate("owner", "email phone");
 
   const totalCount = await Notice.countDocuments(searchQuery);
 
