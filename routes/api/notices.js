@@ -5,14 +5,13 @@ const {
   noticesFilter,
   authenticate,
   validateBody,
-  upload,
 } = require("../../middleWares");
 const ctrl = require("../../controllers/notices");
 const noticeSchema = require("../../schemas/noticeSchema");
 
 router.get("/", ctrl.getAll);
 
-router.get("/", authenticate, noticesFilter, ctrl.getUsersNotices);
+router.get("/my-pets", authenticate, noticesFilter, ctrl.getUsersNotices);
 
 router.get("/favorite", authenticate, noticesFilter, ctrl.getFavoriteNotices);
 router.post("/favorite/:id", authenticate, ctrl.addToFavorite);
@@ -25,14 +24,9 @@ router.get("/notice/:id", authenticate, ctrl.getById);
 
 router.delete("/:id", authenticate, ctrl.deleteById);
 
-router.post(
-  "/:category",
-  authenticate,
-  upload.single("avatarURL"),
-  validateBody(noticeSchema),
-  ctrl.addNotice
-);
+router.post("/owner", authenticate, validateBody(noticeSchema), ctrl.addNotice);
 
 router.get("/:categoryName", ctrl.getNoticesByCategory);
+router.get("/", authenticate, noticesFilter, ctrl.getUsersNotices);
 
 module.exports = router;
