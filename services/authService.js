@@ -56,6 +56,7 @@ const login = async (email, password) => {
     user: {
       name: userInBase.name,
       email: userInBase.email,
+      favorite: userInBase.favorite,
     },
   };
 };
