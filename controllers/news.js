@@ -8,13 +8,13 @@ const getNews = async (req, res) => {
     skip,
     limit: Number(limit),
   }).sort({ date: -1 });
-  const totalHints = await News.count();
+  const totalHits = await News.count();
 
   res.status(200).json({
     result,
     page: Number(page),
-    hints: Number(limit),
-    totalHints,
+    hits: Number(limit),
+    totalHits,
   });
 };
 
