@@ -332,7 +332,53 @@
         }
       }
     },
-    "/notices/my-ads": {
+    "/notices{category}": {
+      
+      "post": {
+        "tags": ["Notices"],
+        "summary": "Add new notice",
+        "security": [{ "Bearer": [] }],
+        "produces": ["application/json"],
+        "requestBody": {
+          "description": "Notice data",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/NoticesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notice added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoticesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Invalid token"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/notices/my-ads":{
       "get": {
         "tags": ["Notices"],
         "summary": "Get notices for owner",
@@ -436,49 +482,6 @@
             "content": {}
           }
         }
-      },
-      "post": {
-        "tags": ["Notices"],
-        "summary": "Add new notice",
-        "security": [{ "Bearer": [] }],
-        "produces": ["application/json"],
-        "requestBody": {
-          "description": "Notice data",
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/NoticesRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Notice added",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NoticesResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Not authorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "message": "Invalid token"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {}
-          }
-        }
       }
     },
     "/notices/{id}": {
@@ -550,7 +553,7 @@
         }
       }
     },
-    "/notices/favorite/add/{id}": {
+    "/notices/favorite/{id}": {
       "post": {
         "tags": ["Notices"],
         "summary": "Add notice to favorite",
@@ -586,7 +589,7 @@
         }
       }
     },
-    "/notices/favorite/delete/{id}": {
+    "/notices/favorite{id}": {
       "delete": {
         "tags": ["Notices"],
         "summary": "Delete notice to favorite",
@@ -729,8 +732,8 @@
       }
     },
 
-    "/users/pets": {
-      "patch": {
+    "/pets": {
+      "post": {
         "tags": ["Pets"],
         "summary": "Add new pet",
         "security": [{ "Bearer": [] }],
@@ -774,10 +777,10 @@
         }
       }
     },
-    "/users/pets/{id}": {
+    "/pets/{id}": {
       "delete": {
         "tags": ["Pets"],
-        "summary": "Delete a pet by id",
+        "summary": "Delete pet by id",
         "security": [{ "Bearer": [] }],
         "parameters": [
           {
