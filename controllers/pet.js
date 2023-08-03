@@ -8,7 +8,7 @@ const getAllPets = async (req, res, next) => {
     query,
   } = req;
 
-  const { page = 1, limit = 20 } = query;
+  const { page = 1, limit = 12 } = query;
   const skip = (page - 1) * limit;
 
   const totalResults = await Pet.find({ owner: userId }).count();
@@ -21,10 +21,6 @@ const getAllPets = async (req, res, next) => {
   })
     .populate("owner", "name email phone")
     .lean();
-
-  if (!pets || pets.length === 0) {
-    return next(new RequestError(404, "No pets for your request"));
-  }
 
   res.status(200).json({
     totalResults,
