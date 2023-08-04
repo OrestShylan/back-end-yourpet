@@ -39,7 +39,7 @@ const Pet = model("Pet", petsSchema);
 
 const addPetJoiSchema = Joi.object().keys({
   name: Joi.string().min(2).max(16).required(),
-  date: Joi.date().max("now").required(),
+  date: Joi.date().iso().less("now").required(),
   type: Joi.string().min(2).max(16).required(),
   comments: Joi.string().min(0).max(120).required(),
   avatarURL: Joi.string(),
