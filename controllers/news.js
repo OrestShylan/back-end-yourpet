@@ -1,5 +1,5 @@
 const { ctrlWrapper, RequestError } = require("../helpers");
-const {News} = require('../models/newsModel')
+const { News } = require("../models/newsModel");
 
 const getNews = async (req, res) => {
   const { page = 1, limit = 6 } = req.query;
@@ -8,13 +8,13 @@ const getNews = async (req, res) => {
     skip,
     limit: Number(limit),
   }).sort({ date: -1 });
-  const totalHits = await News.count();
+  const totalHints = await News.count();
 
   res.status(200).json({
     result,
     page: Number(page),
-    hits: Number(limit),
-    totalHits,
+    hints: Number(limit),
+    totalHints,
   });
 };
 
@@ -66,5 +66,4 @@ const getNewsByQuery = async (req, res) => {
 module.exports = {
   getNews: ctrlWrapper(getNews),
   getNewsByQuery: ctrlWrapper(getNewsByQuery),
-}
-
+};
